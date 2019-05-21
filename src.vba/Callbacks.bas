@@ -44,12 +44,6 @@ Public Sub CallbackDropship(control As IRibbonControl)
 
 End Sub
 
-Public Sub CallbackImportHerko(control As IRibbonControl)
-
-    FindHerkoReport
-
-End Sub
-
 Public Sub CallbackImportShipstation(control As IRibbonControl)
 
     FindShipstationReport

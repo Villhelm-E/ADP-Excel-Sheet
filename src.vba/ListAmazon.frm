@@ -938,7 +938,7 @@ Private Sub EnterShippingTemplate(LastColumnLetter As String, ListingRow As Inte
         End Select
     Else
         'If user entered Prime for shipping template, replace with Prime shipping template
-        Cells(ListingRow, shiptempcol).Value = "Regional Prime (Ground)"
+        Cells(ListingRow, shiptempcol).Value = Me.merchant_shipping_group_name
     End If
     
 End Sub
@@ -961,7 +961,7 @@ Private Sub EnterNumberofItems(LastColumnLetter As String, ListingRow As Integer
     Dim FoundColumn As Integer
     
     FoundColumn = AmazonColumn(LastColumnLetter, "number_of_items")
-    If FoundColumn > 0 Then Cells(ListingRow, FoundColumn).Value = 1
+    If FoundColumn > 0 Then Cells(ListingRow, FoundColumn).Value = Me.item_package_quantity
 
 End Sub
 

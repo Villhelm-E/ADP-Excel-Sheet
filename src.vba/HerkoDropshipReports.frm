@@ -10,7 +10,7 @@ Private Sub UserForm_Initialize()
     'Add Worksheets to Listbox
     Dim sheetsArr()
     ReDim sheetsArr(0)
-    Call SearchSheets(sheetsArr, "Herko *-*-##*-*-##") 'add every sheet that matches that pattern to an array
+    Call SearchSheets(sheetsArr, "Shipstation*##**##") 'add every sheet that matches that pattern to an array
 
     Dim i As Integer
     For i = LBound(sheetsArr) To UBound(sheetsArr)

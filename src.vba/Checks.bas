@@ -232,12 +232,11 @@ End Function
 
 Public Function CheckDropship() As String
 
-    If Range("A1").Value = "Date" And Range("B1").Value = "Client Name" And Range("C1").Value = "qb#" And Range("D1").Value = "Qty" And Range("E1").Value = "Unit Price" And _
-    Range("F1").Value = "Total" And Range("G1").Value = "SO #" And Range("H1").Value = "SHIPPING" And Range("I1").Value = "" Then
+    If Range("A1").Value = "Item" And Range("B1").Value = "Desc" And Range("C1").Value = "customer" And Range("D1").Value = "so" And Range("E1").Value = "Qty Sold" And _
+    Range("F1").Value = "Unit Price" And Range("G1").Value = "Total Amount" And Range("H1").Value = "TaxCode" And Range("I1").Value = "" Then
         CheckDropship = "Herko"
-    ElseIf Range("A1").Value = "Amount - Order Total" And Range("B1").Value = "Ship To - Company" And Range("C1").Value = "Ship To - Name" And Range("D1").Value = "Ship To - Country" And _
-    Range("E1").Value = "Bill To - Name" And Range("F1").Value = "Service - Package Type" And Range("G1").Value = "Service - Confirmation Type" And Range("H1").Value = "Dimensions - Height" And _
-    Range("I1").Value = "Tags" And Range("J1").Value = "Insurance - Cost" And Range("K1").Value = "Ship To - Zone" And Range("L1").Value = "Count - Number of Items" Then
+    ElseIf Range("A1").Value = "Date - Shipped Date" And Range("B1").Value = "Customer Email" And Range("C1").Value = "Ship To - Name" And Range("D1").Value = "Amount - Order Total" And _
+    Range("E1").Value = "Amount - Shipping Cost" And Range("F1").Value = "" Then
         CheckDropship = "Shipstation"
     Else
         CheckDropship = ""
@@ -275,10 +274,12 @@ Public Function CheckFormattedHerko() As Boolean
 
 End Function
 
-Public Function CheckFormattedShipstation() As Boolean
+Public Function CheckFormattedDropship() As Boolean
 
-    If Range("A1").Value = "Date - Shipped Date" And Range("B1").Value = "Ship To - Name" And IsEmpty(Range("I2").Value) Then
-        CheckFormattedShipstation = True
+    If Range("A1").Value = "Item" And Range("B1").Value = "Desc" And Range("C1").Value = "customer" And Range("D1").Value = "so" And Range("E1").Value = "Qty Sold" And _
+    Range("F1").Value = "Unit Price" And Range("G1").Value = "Total Amount" And Range("H1").Value = "Shipping Cost" And Range("I1").Value = "AD Total Price" And _
+    Range("K1").Value = "Profit/Loss" And Range("L1").Value = "" Then
+        CheckFormattedDropship = True
     End If
 
 End Function
@@ -320,3 +321,4 @@ Public Function CheckVolumePricing()
     Range("M1").Value = "T4 Max. Qty" And Range("N1").Value = "T4 Offset Value" Then CheckVolumePricing = True
 
 End Function
+

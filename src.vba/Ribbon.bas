@@ -71,7 +71,7 @@ Public Sub RibbonCategories()
     ElseIf CheckDropship <> "" Then
         'check if Dropship report
         Tag = "*m*"
-    ElseIf CheckFormattedShipstation = True Then
+    ElseIf CheckFormattedDropship = True Then
         'check if formatted dropship report
         Tag = "*n*"
     ElseIf CheckVolumePricing = True Then
