@@ -192,7 +192,7 @@ Public Function CheckBoM() As Boolean
     
     'check fields and empty cells to determine if BoM report
     If Range("A1").Text = "Product ID" And Range("B1").Text = "Description" And Range("C1").Text = "Quantity" And Range("D1").Text = "Product ID" And Range("E1").Text = "Description" And _
-    Range("F1").Text = "Item note" And Range("A2").Text <> "" And Range("A3").Text = "" Then CheckBoM = True
+    Range("F1").Text = "Component note" And Range("A2").Text <> "" And Range("A3").Text = "" Then CheckBoM = True
 
 End Function
 

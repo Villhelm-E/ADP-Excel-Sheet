@@ -103,6 +103,8 @@ Private Sub Conditionals()
 
     'variables
     Dim profitcol As Range
+    Dim custcol As Range
+    Dim uv As UniqueValues
     Dim cond As FormatCondition
     
     'define range
@@ -116,6 +118,16 @@ Private Sub Conditionals()
     
     'apply conditions and formatting
     With cond
+        .Interior.Color = 13551615
+        .Font.Color = -16383844
+    End With
+    
+    'apply conditional formatting to find duplicate customers
+    Set custcol = Range("B2", Range("B2").End(xlDown))
+    
+    Set uv = custcol.FormatConditions.AddUniqueValues
+    uv.DupeUnique = xlDuplicate
+    With uv
         .Interior.Color = 13551615
         .Font.Color = -16383844
     End With
@@ -154,15 +166,25 @@ Private Sub ShipstationFinalFormat(numrows As Integer)
 End Sub
 
 Private Sub RenameSheet(Source As String, numrows As Integer)
-
+    
+    On Error GoTo dateError
+    
     Dim yearStart As String
     Dim yearEnd As String
     
     yearStart = Left(Range("A2"), Len(Range("A2")) - 4) & Right(Range("A2"), 2)
     yearEnd = Left(Range("A" & numrows), Len(Range("A" & numrows)) - 4) & Right(Range("A" & numrows), 2)
     
+    If yearStart = yearEnd Then
+        ActiveSheet.Name = Replace(Source & " " & yearStart, "/", "-")
+    Else
+        ActiveSheet.Name = Replace(Source & " " & yearStart & "" & yearEnd, "/", "-")
+    End If
     
-    ActiveSheet.Name = Replace(Source & " " & yearStart & "" & yearEnd, "/", "-")
+    Exit Sub
+    
+dateError:
+    ActiveSheet.Name = "Herko"
     
 End Sub
 
@@ -204,6 +226,7 @@ Public Sub ImportShipstationReport(ChosenSheet As Worksheet)
     'format date column
     FormatDate
     
+    'Fill in Ship Date, Shipping Cost, and Selling Price
     Call Formula(HerkoReportName, ShipstationNumRows)
     
     'resize the profit column
@@ -235,5 +258,27 @@ Private Sub Formula(HerkoReportName As String, LastRow As Integer)
     Range("A2:A" & LastRow).Formula = "=INDEX('" & HerkoReportName & "'!A:A,MATCH(C2,'" & HerkoReportName & "'!C:C,0))"
     Range("I2:I" & LastRow).Formula = "=INDEX('" & HerkoReportName & "'!E:E,MATCH(C2,'" & HerkoReportName & "'!C:C,0))"
     Range("K2:K" & LastRow).Formula = "=INDEX('" & HerkoReportName & "'!D:D,MATCH(C2,'" & HerkoReportName & "'!C:C,0))"
+    
+    'Replace formulas in Ship Date, Shipping Cost, and Selling Price with values
+    With Range("A2:A" & LastRow)
+        .Cells.Copy
+        .Cells.PasteSpecial xlPasteValues
+        .Cells(1).Select
+    End With
+    Application.CutCopyMode = False
+    
+    With Range("I2:I" & LastRow)
+        .Cells.Copy
+        .Cells.PasteSpecial xlPasteValues
+        .Cells(1).Select
+    End With
+    Application.CutCopyMode = False
+    
+    With Range("K2:K" & LastRow)
+        .Cells.Copy
+        .Cells.PasteSpecial xlPasteValues
+        .Cells(1).Select
+    End With
+    Application.CutCopyMode = False
 
 End Sub

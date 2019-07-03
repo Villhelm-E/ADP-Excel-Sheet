@@ -46,31 +46,31 @@ End Sub
 
 Public Sub CallbackImportShipstation(control As IRibbonControl)
 
-    FindShipstationReport
+    FindShipstationReport   'Dropship module
 
 End Sub
 
 Public Sub CallbackSoldReport(control As IRibbonControl)
 
-    FormatReportMain
+    FormatReportMain    '
 
 End Sub
 
 Public Sub CallbackRemoveKeep(control As IRibbonControl)
 
-    RemoveKeepMain
+    RemoveKeepMain  '
 
 End Sub
 
 Public Sub CallbackConfirmInv(control As IRibbonControl)
 
-    ConfirmInvMain
+    ConfirmInvMain  '
 
 End Sub
 
 Public Sub CallbackRemoveInactive(control As IRibbonControl)
 
-    RemoveInactiveMain
+    RemoveInactiveMain  '
 
 End Sub
 

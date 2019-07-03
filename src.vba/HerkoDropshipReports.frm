@@ -27,7 +27,7 @@ Public Sub SearchSheets(sheetsArr, MatchString As String)
     For Each wsSheet In Worksheets
         If wsSheet.Name Like MatchString Then
             'if array already has values, then add a new entry to array
-            If UBound(sheetsArr) > 0 Then ReDim Preserve sheetsArr(UBound(sheetsArr) + 1)
+            If IsEmpty(sheetsArr(0)) = False Then ReDim Preserve sheetsArr(UBound(sheetsArr) + 1)
             'save the current worksheet's name to the last entry in the array
             sheetsArr(UBound(sheetsArr)) = wsSheet.Name
         End If
