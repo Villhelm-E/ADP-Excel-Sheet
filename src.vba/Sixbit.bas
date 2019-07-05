@@ -1307,10 +1307,11 @@ End Sub
 
 Private Sub ReplicatePart(Row As Integer)
 
-    'Adds Part number, part type, brand_code
+    'Adds Part number, part type, brand_code, and sku
     Cells(Row, 1).Value = PartName
     Cells(Row, 2).Value = "FVKX"
     Cells(Row, 6).Value = PartTypeVar
+    Cells(Row, 51).Value = gendSKU
 
 End Sub
 
@@ -1367,5 +1368,6 @@ Private Sub Headers()
     Range("A1:V1").Value = [{"part", "brand_code", "make", "model", "year", "partterminologyname", "notes", "qty", "mfrlabel", "position", "aspiration","bedlength","bedtype","block","bodynumdoors","bodytype","brakeabs","brakesystem","cc","cid","cylinderheadtype","cylinders"}]
     Range("W1:AK1").Value = [{"drivetype", "enginedesignation","enginemfr","engineversion","enginevin","frontbraketype","frontspringtype","fueldeliverysubtype","fueldeliverytype","fuelsystemcontroltype","fuelsystemdesign","fueltype","ignitionsystemtype", "liters","mfrbodycode"}]
     Range("AL1:AX1").Value = [{"rearbraketype", "rearspringtype","region","steeringsystem","steeringtype","submodel","transmissioncontroltype","transmissionmfr","transmissionmfrcode","transmissionnumspeeds", "transmissiontype", "valvesperengine", "wheelbase"}]
+    Range("AY1").Value = "sku"
 
 End Sub

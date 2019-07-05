@@ -22,6 +22,9 @@ Public Formatted As Boolean
 'Variable for SKUForm
 Public SKU As String
 
+'Variable for SourceForm
+Public gendSKU As String
+
 'Variables for ListAmazon form
 Public PageCount As Integer
 Public ListType As String

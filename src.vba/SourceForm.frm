@@ -136,6 +136,22 @@ Private Sub FormatBtn_Click()
             FitmentSource = Me.FitmentSourceCombo.Value         'FitmentSource is global variable
         End If
         
+        'generate SKU
+        Dim prefix As String
+        Dim suffix As String
+        
+        'grab suffix code
+        Set rst = MstrDb.Execute("SELECT SuffixCode FROM Manufacturers WHERE [ManufacturerFull] = " & Chr(34) & Me.BrandCombo.Value & Chr(34))
+        suffix = rst.Fields("SuffixCode").Value
+        rst.Close
+        
+        'grab prefix code
+        Set rst = MstrDb.Execute("SELECT PrefixCode FROM AAIAPartTypes WHERE [AAIAPartType] = " & Chr(34) & Me.PartTypeCombo.Value & Chr(34))
+        prefix = rst.Fields("PrefixCode").Value
+        rst.Close
+        
+        gendSKU = prefix & "-" & Me.PartNumBox.Value & "-" & suffix
+        
         'close
         'only unload userform if user has entered in all required fields
         Unload Me

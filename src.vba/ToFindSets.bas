@@ -222,11 +222,9 @@ End Sub
 Private Sub RevertExcel()
 
     'replace html code for ampersand with regular ampersands
-    Range("A:AX").Replace "&", "&amp;"
     Range("A:AX").Replace "&amp;", "&"
     
     'replace spaces with non-breaking spaces
-    Range("A:AX").Replace " ", " "              'first string is regular space, second string is non-breaking space
     Range("A:AX").Replace " ", " "              'first string is non-brekaing space, second string is regular space
 
 End Sub

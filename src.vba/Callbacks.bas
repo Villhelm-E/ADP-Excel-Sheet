@@ -124,7 +124,7 @@ End Sub
 
 Public Sub CallbackUPC(control As IRibbonControl)
 
-    UPC
+    UPC '
 
 End Sub
 
