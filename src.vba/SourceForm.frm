@@ -6,6 +6,10 @@ Option Explicit
 Private Sub UserForm_Initialize()
 
 On Error GoTo UserForm_Initialize_Err
+
+    Me.StartUpPosition = 0
+    Me.Left = Application.Left + (0.5 * Application.Width) - (0.5 * Me.Width)
+    Me.Top = Application.Top + (0.5 * Application.Height) - (0.5 * Me.Height)
     
     'load parttypes into combobox
     LoadPartTypes

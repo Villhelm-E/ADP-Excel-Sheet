@@ -17,6 +17,7 @@ Public Sub ConnectMasterDatabase()
     
     'open connection to Master Database
     MstrDb.Open Provider & "Data Source=" & DBPath      'MstrDb is a global variable
+    MstrDb.CursorLocation = adUseClient
     
     Exit Sub
     
@@ -36,6 +37,7 @@ Public Sub ConnectFindSetsDatabase()
     
     'open connection to Find Sets Database
     FndStsDb.Open Provider & "Data Source=" & DBPath    'FndStsDb is global variable
+    FndStsDb.CursorLocation = adUseClient
     
     Exit Sub
     
@@ -57,6 +59,7 @@ Public Sub ConnectSixbitDatabase()
 
     'open connection to Sixbit database
     SxbtDb.Open "Provider=SQLOLEDB;Server=ADP-SERVER\SIXBITDBSERVER;Database=Sixbit;User Id=sa;Password=S1xb1tR0x;"     'unfortunately have to hard code the usernmae and password
+    SxbtDb.CursorLocation = adUseClient
 
     Exit Sub
 

@@ -19,30 +19,10 @@ Private Sub UserForm_Initialize()
     UBCats = UBound(CategoriesArr())
     
     'Add Categories to Listbox
-    Dim numCats As Integer
-    numCats = 0
-    With rst
-        Do While Not .EOF
-            Me.ListBox1.AddItem rst.Fields("Category").Value
-            numCats = numCats + 1
-            rst.MoveNext
-        Loop
-    End With
-    
-    ReDim CategoriesArr(numCats - 1, 0)
-    
     Dim i As Integer
-    i = 0
-    rst.MoveFirst
-    With rst
-        Do While Not .EOF
-            CategoriesArr(i, 0) = rst.Fields("Category").Value
-            i = i + 1
-            rst.MoveNext
-        Loop
-    End With
-    
-    rst.Close
+    For i = 0 To UBCats
+        Me.CategoryListBox.AddItem CategoriesArr(i, 0)
+    Next i
 
 End Sub
 
@@ -50,14 +30,13 @@ End Sub
 Private Sub RedimFinaleFields()
 
     'Query Finale Fields
-    Set rst = MstrDb.Execute("SELECT FinaleProductFields.Field, FinaleProductFields.Category FROM FinaleProductFields WHERE (Not FinaleProductFields.Category=""Default"") ORDER BY FinaleProductFields.ID")
-    
-    Dim count As Integer
+    Set rst = MstrDb.Execute("SELECT [Field], [Category] FROM [FinaleProductFields] WHERE ((Not ([Category])=" & Chr(34) & "Default" & Chr(34) & ")) ORDER BY [ID];")
     
     'convert query to array
+    Dim count As Integer
     With rst
         rst.MoveFirst
-        
+
         'count the number of records
         count = rst.RecordCount
         
@@ -67,10 +46,10 @@ Private Sub RedimFinaleFields()
         'loop through rst
         While Not .EOF
             'first value in array is the field name
-            FinaleFields(rst.Index, 0) = rst.Fields("Field").Value
+            FinaleFields(rst.AbsolutePosition - 1, 0) = rst.Fields("Field").Value
             
             'the second value in array is the category
-            FinaleFields(rst.Index, 1) = rst.Fields("Category").Value
+            FinaleFields(rst.AbsolutePosition - 1, 1) = rst.Fields("Category").Value
             
             rst.MoveNext
         Wend
@@ -84,7 +63,7 @@ End Sub
 Private Sub RedimCategoriesArr()
 
     'Query unique Categories
-    Set rst = MstrDb.Execute("SELECT DISTINCT FinaleProductFields.Category FROM FinaleProductFields WHERE (Not FinaleProductFields.Category=""Default"") ORDER BY FinaleProductFields.Category")
+    Set rst = MstrDb.Execute("SELECT DISTINCT FinaleProductFields.Category, Active FROM FinaleProductFields WHERE (Not FinaleProductFields.Category=""Default"") ORDER BY FinaleProductFields.Category")
     
     Dim count As Integer
     With rst
@@ -94,15 +73,11 @@ Private Sub RedimCategoriesArr()
         
         ReDim CategoriesArr(count - 1, 1)
         
-        Dim fieldIndex As Integer
-        
         While Not .EOF
             
-            CategoriesArr(rst.Index, 0) = rst.Fields("Category").Value
+            CategoriesArr(rst.AbsolutePosition - 1, 0) = rst.Fields("Category").Value
             
-            For fieldIndex = 0 To UBFields
-                CategoriesArr(rst.Index, fieldIndex) = "False"
-            Next fieldIndex
+            CategoriesArr(rst.AbsolutePosition - 1, 1) = "False"
             
             rst.MoveNext
         Wend
@@ -150,19 +125,19 @@ Private Sub PopulateCategoriesArray()
 
 End Sub
 
-Private Sub ListBox1_AfterUpdate()
+Private Sub CategoryListBox_AfterUpdate()
 
     Dim i As Integer
     Dim Cat As String
     Dim x As Integer
     
-    'loop through listbox to find the selected option
-    For i = 0 To Me.ListBox1.ListCount - 1
-        If Me.ListBox1.Selected(i) = True Then
+    'loop through CategoriesListBox to find the selected option
+    For i = 0 To Me.CategoryListBox.ListCount - 1
+        If Me.CategoryListBox.Selected(i) = True Then
             'when loop finds selected option, save to variable
-            Cat = Me.ListBox1.List(i)
+            Cat = Me.CategoryListBox.List(i)
             'and end the loop
-            i = Me.ListBox1.ListCount - 1
+            i = Me.CategoryListBox.ListCount - 1
         End If
     Next i
     
