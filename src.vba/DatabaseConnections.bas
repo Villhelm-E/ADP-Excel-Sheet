@@ -58,8 +58,22 @@ Public Sub ConnectSixbitDatabase()
     SxbtDb.CommandTimeout = 0
 
     'open connection to Sixbit database
-    SxbtDb.Open "Provider=SQLOLEDB;Server=ADP-SERVER\SIXBITDBSERVER;Database=Sixbit;User Id=sa;Password=S1xb1tR0x;"     'unfortunately have to hard code the usernmae and password
+    'open username info
+    Dim user As String
+    Dim pw As String
+    Set rst = MstrDb.Execute("SELECT * FROM Sixbit_DB_Fields")
+    rst.MoveLast
+    
+    user = rst.Fields("Sixbit_UserID").Value
+    pw = rst.Fields("Sixbit_PW").Value
+    
+    SxbtDb.Open "Provider=SQLOLEDB;Server=ADP-SERVER\SIXBITDBSERVER;Database=Sixbit;User Id=" & user & ";Password=" & pw & ";"
     SxbtDb.CursorLocation = adUseClient
+    
+    'close out connection
+    rst.Close
+    user = ""
+    pw = ""
 
     Exit Sub
 
