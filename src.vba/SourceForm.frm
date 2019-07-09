@@ -154,7 +154,11 @@ Private Sub FormatBtn_Click()
         prefix = rst.Fields("PrefixCode").Value
         rst.Close
         
-        gendSKU = prefix & "-" & Me.PartNumBox.Value & "-" & suffix
+        If InStr(1, Me.PartNumBox.Value, "+") > 0 Then
+            gendSKU = prefix & "-" & Me.PartNumBox.Value    'gendSKU is global variable
+        Else
+            gendSKU = prefix & "-" & Me.PartNumBox.Value & "-" & suffix
+        End If
         
         'close
         'only unload userform if user has entered in all required fields

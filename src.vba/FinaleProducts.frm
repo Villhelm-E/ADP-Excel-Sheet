@@ -186,18 +186,18 @@ Private Sub ListBox2_Change()
     
     
     'loop through listbox to find the selected option
-    For i = 0 To Me.ListBox1.ListCount - 1
-        If Me.ListBox1.Selected(i) = True Then
+    For i = 0 To Me.CategoryListBox.ListCount - 1
+        If Me.CategoryListBox.Selected(i) = True Then
             'when loop finds selected option, save to variable
-            CurrCat = Me.ListBox1.ListIndex
+            CurrCat = Me.CategoryListBox.ListIndex
             'and end the loop
-            i = Me.ListBox1.ListCount - 1
+            i = Me.CategoryListBox.ListCount - 1
         End If
     Next i
     
     UBFields = Me.ListBox2.ListCount - 1
     
-    ReDim Preserve CategoriesArr(Me.ListBox1.ListCount - 1, UBFields)
+    ReDim Preserve CategoriesArr(Me.CategoryListBox.ListCount - 1, UBFields)
     
     'loop through listbox to find the selected option
     For i = 0 To UBFields

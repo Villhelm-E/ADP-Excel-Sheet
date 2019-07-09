@@ -158,16 +158,6 @@ Private Sub merchant_shipping_group_name_Change()
 
 End Sub
 
-Private Sub number_of_items_Change()
-
-    If Me.number_of_items.Value = "" Then
-        Me.NumItemsLabel.ForeColor = RGB(255, 0, 0)
-    Else
-        Me.NumItemsLabel.ForeColor = RGB(0, 0, 0)
-    End If
-
-End Sub
-
 Private Sub ListButton_Click()
     
     Dim AmazonFields() As Variant
