@@ -106,7 +106,7 @@ Public Function CheckFinaleProducts() As Boolean
     Range("F1").Value = "Std reorder in qty of" And Range("G1").Value = "Manufacturer" And Range("H1").Value = "Mfg product ID" And Range("I1").Value = "Supplier 1" And _
     Range("J1").Value = "Supplier 1 price" And Range("K1").Value = "Supplier 1 product ID" And Range("L1").Value = "Supplier 1 comments" And Range("M1").Value = "Location" And _
     Range("N1").Value = "Interchange 1" And Range("O1").Value = "Interchange 2" And Range("P1").Value = "Interchange 3" And Range("Q1").Value = "Interchange 4" And _
-    Range("R1").Value = "Live Status" And Range("S1").Value = "Sorting" Then
+    Range("R1").Value = "Listing Status" And Range("S1").Value = "Sorting" Then
         
         CheckFinaleProducts = True
     Else

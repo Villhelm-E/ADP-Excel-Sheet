@@ -69,7 +69,7 @@ Private Sub ParentagePageCheck()
 
     Dim parentagePage As Integer
     
-    parentagePage = 2
+    parentagePage = 2   '2nd page of multipage
     
     'Parentage page in Multipage should only appear if user checked the variations checkbox
     If Me.ParentageCheckBox = True Then
@@ -161,18 +161,21 @@ End Sub
 Private Sub ListButton_Click()
     
     Dim AmazonFields() As Variant
+    Dim LastColumnLetter As String
     ReDim AmazonFields(0) As Variant
     
     'Headers
     If CheckAmazonTemplate = False Then Call AmazonHeaders     'Amazon module
+    'Save the number and letter of the last column
+    LastColumnLetter = NumberToColumn(CountColumns(Range("2:2")))
     
     'check if set
     Select Case ListingMode
         Case "Single"
             If Me.ParentageCheckBox = False Then
-                ListSingle
+                Call ListSingle(CountRows("A:A") + 1, LastColumnLetter, False)
             Else
-                ListSets
+                Call ListSets(LastColumnLetter)
             End If
         
         Case "Set"
@@ -272,20 +275,29 @@ Private Sub MultiPage1_Change()
     'rename userform caption based on page caption
     ListAmazon.Caption = "List on Amazon (" & MultiPage1.SelectedItem.Caption & ")"
     
+    'If user is on Part page run PartInfoSub
     If ListAmazon.Caption Like "*Part*" Then
         PartInfoSub
     End If
     
+    'If user is on PArentage page run
+    If ListAmazon.Caption Like "*Parentage*" Then
+        Me.parent_sku.Value = GenSKU(True)
+    End If
+    
+    'If user is on Review page run ReviewPageSub
     If ListAmazon.Caption Like "*Review*" Then
         ReviewPageSub
     End If
     
+    'If user is on second page change the caption of the back/cancel button
     If MultiPage1.Value = 1 Then
         Me.PreviousPage.Caption = "Cancel Listing"
     Else
         Me.PreviousPage.Caption = "Back"
     End If
     
+    'check if parentage is selected
     ParentagePageCheck
 
 End Sub
@@ -331,11 +343,12 @@ Private Sub ReviewPageSub()
 
 End Sub
 
-Private Sub GenSKU()
+Private Function GenSKU(Optional parent As Boolean) As String
 
     'Get the Prefix Code from Part Type
     Dim prefix As String
     Set rst = MstrDb.Execute("SELECT DISTINCT * FROM PartTypes WHERE ACESPartType=" & Chr(34) & Me.part_type_id.Value & Chr(34))
+    rst.MoveFirst
     prefix = rst.Fields("PrefixCode").Value
     rst.Close
     
@@ -345,16 +358,19 @@ Private Sub GenSKU()
     suffix = rst.Fields("SuffixCode").Value
     rst.Close
     
+    If parent = True Then suffix = suffix & "-P"
+    
     'Generate SKU
-    Me.item_sku.Value = prefix & "-" & Me.part_number & "-" & suffix
+    GenSKU = prefix & "-" & Me.part_number & "-" & suffix
+    Me.item_sku.Value = GenSKU
 
-End Sub
+End Function
 
 Private Sub GenDesc()
 
     Select Case Me.ParentageCheckBox
         Case False
-            Me.product_description.Value = Me.Manufacturer.Value & " " & Me.part_number.Value & " " & Me.part_type_id.Value
+            
         Case True
             
     End Select
@@ -696,106 +712,183 @@ Exit_Loop:
 
 End Sub
 
-Private Sub ListSingle()
-
-    Dim LastColumnLetter As String
-    Dim ListingRow As Integer
+'listingRow is the row that will be populated in the sheet for that listing
+'IsSet is used to list a single part number, if false, only a single listing is being listed, if true then multiple sets of that part number are being listed
+'setArr and i are only needed for listing multiple sets of a single part number
+Private Sub ListSingle(listingrow As Integer, LastColumnLetter As String, IsSet As Boolean, Optional setArr, Optional i As Integer)
     
-    'count number of rows and add 1 to find the next blank row
-    ListingRow = CountRows("A:A") + 1
-    
-    'Save the number and letter of the last column
-    LastColumnLetter = NumberToColumn(CountColumns(Range("2:2")))
-    
-    'loop through controls and populate header with values user entered
-    Call EnterControls(LastColumnLetter, ListingRow)
+    'Match the control name in the Form to the field name in the sheet and put the user-entered value into the correct cell
+    Call EnterControls(LastColumnLetter, listingrow)
     
     'Product Id type
-    Call EnterProductIDType(LastColumnLetter, ListingRow)
+    Call EnterProductIDType(LastColumnLetter, listingrow)
     
     'Feed product type
-    Call EnterFeedProductType(LastColumnLetter, ListingRow)
+    Call EnterFeedProductType(LastColumnLetter, listingrow)
     
     'Item Type Keyword
-    Call EnterItemType(LastColumnLetter, ListingRow)
+    Call EnterItemType(LastColumnLetter, listingrow)
 
     'Brand
-    Call EnterBrand(LastColumnLetter, ListingRow)
+    Call EnterBrand(LastColumnLetter, listingrow)
+    
+    'Price
+    Call EnterPrice(LastColumnLetter, listingrow, setArr, i)
+    
+    'Package Quantity
+    Call EnterPackageQauntity(LastColumnLetter, listingrow)
     
     'Shipping Template
-    Call EnterShippingTemplate(LastColumnLetter, ListingRow)
+    Call EnterShippingTemplate(LastColumnLetter, listingrow)
     
     'Is dicontinued by manufacturer
-    Call EnterDiscontinued(LastColumnLetter, ListingRow)
+    Call EnterDiscontinued(LastColumnLetter, listingrow)
     
     'number of items
-    Call EnterNumberofItems(LastColumnLetter, ListingRow)
+    Call EnterNumberofItems(LastColumnLetter, listingrow, IsSet, setArr, i)
 
     'quantity
-    Call EnterQuantity(LastColumnLetter, ListingRow)
+    Call EnterQuantity(LastColumnLetter, listingrow)
 
     'product tax code
-    Call EnterTaxCode(LastColumnLetter, ListingRow)
+    Call EnterTaxCode(LastColumnLetter, listingrow)
 
     'handling time
-    Call EnterHandlingTime(LastColumnLetter, ListingRow)
+    Call EnterHandlingTime(LastColumnLetter, listingrow)
     
     'Item Dimensions Unit of Measure
-    Call EnterDimensionsUnitOfMeasure(LastColumnLetter, ListingRow)
+    Call EnterDimensionsUnitOfMeasure(LastColumnLetter, listingrow)
     
     'California Prop 65 Warning
-    Call EnterProp65(LastColumnLetter, ListingRow)
+    Call EnterProp65(LastColumnLetter, listingrow)
 
     'warranty
-    Call EnterWarranty(LastColumnLetter, ListingRow)
+    Call EnterWarranty(LastColumnLetter, listingrow)
+    
+    'Size Name
+    If IsSet = True Then
+        'Weight
+        Call EnterWeight(LastColumnLetter, listingrow, setArr, i)
+        
+        'package quantity
+        If AmazonColumn(LastColumnLetter, "item_package_quantity") > 0 Then Cells(listingrow, AmazonColumn(LastColumnLetter, "item_package_quantity")).Value = Replace(setArr(i), "Setof", "")
+        
+        'Size Name
+        Call EnterSizeName(LastColumnLetter, listingrow, setArr, i)
+        
+        'overwrite part number
+        If AmazonColumn(LastColumnLetter, "part_number") > 0 Then Cells(listingrow, AmazonColumn(LastColumnLetter, "part_number")).Value = Me.part_number.Value & "-" & _
+            Replace(setArr(i), "Setof", "")
+        
+        'parentage
+        If AmazonColumn(LastColumnLetter, "parent_child") > 0 Then Cells(listingrow, AmazonColumn(LastColumnLetter, "parent_child")).Value = "child"
+        
+        'relationship type
+        If AmazonColumn(LastColumnLetter, "parent_child") > 0 Then Cells(listingrow, AmazonColumn(LastColumnLetter, "relationship_type")).Value = "Variation"
+        
+        'variation theme
+        If AmazonColumn(LastColumnLetter, "parent_child") > 0 Then Cells(listingrow, AmazonColumn(LastColumnLetter, "variation_theme")).Value = "sizeName"
+    End If
 
 End Sub
 
-Private Sub ListSets()
+Private Sub ListSets(LastColumnLetter As String)
 
-    Dim LastColumnLetter As String
-    Dim ListingRow As Integer
-    Dim SetArr()
-    ReDim SetArr(0)
+    Dim listingrow As Integer
+    Dim setArr()
+    ReDim setArr(0)
     
     'put sets user wants to list in an array
-    Call SetsArray(SetArr)
+    Call SetsArray(setArr)
     
     'count number of rows and add 1 to find the next blank row
-    ListingRow = CountRows("A:A") + 1
-    
-    'Save the number and letter of the last column
-    LastColumnLetter = NumberToColumn(CountColumns(Range("2:2")))
+    listingrow = CountRows("A:A") + 1
     
     DefineAmazonVariables
     
     Dim i As Integer
     
-    For i = 1 To UBound(SetArr)
-        Call EnterControls(LastColumnLetter, ListingRow + i)
+    'add parent and parentage field info after doing each set
+    Call ListParent(LastColumnLetter, listingrow)
+    
+    'recount number of rows and add 1 to find the next blank row
+    listingrow = CountRows("A:A") + 1
+    
+    'loop through every set, listing each like single
+    For i = 0 To UBound(setArr)
+        Call ListSingle(listingrow + i, LastColumnLetter, True, setArr, i)
     Next i
 
 End Sub
 
-Private Sub SetsArray(SetArr)
+Private Sub ListParent(LastColumnLetter As String, listingrow As Integer)
+
+    'variable to match field to control
+    Dim foundcolumn As Integer
+    
+    'look for SKU field and populate it with parent SKU user provided
+    foundcolumn = AmazonColumn(LastColumnLetter, "item_sku")
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = Me.parent_sku.Value
+    
+    'populate brand
+    Call EnterBrand(LastColumnLetter, listingrow)
+    
+    'look for title field and populate it with autogenerated title
+    foundcolumn = AmazonColumn(LastColumnLetter, "item_name")
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "Parent title"
+    
+    'look for manufacturer field and populate it with manufacturer user provided
+    foundcolumn = AmazonColumn(LastColumnLetter, "manufacturer")
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = Me.Manufacturer.Value
+    
+    'look for part number field and populate it with autogenerated part number
+    foundcolumn = AmazonColumn(LastColumnLetter, "part_number")
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = Me.part_number & "-P"
+    
+    'look for product type field and populate it with "autopart"
+    Call EnterFeedProductType(LastColumnLetter, listingrow)
+    
+    'look for part type field and populate it with part type user provided
+    foundcolumn = AmazonColumn(LastColumnLetter, "part_type_id")
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = Me.part_type_id.Value
+    
+    'look for item type field and populate it with item type
+    Call EnterItemType(LastColumnLetter, listingrow)
+    
+    'look for condition field and populate it with condition user provided
+    foundcolumn = AmazonColumn(LastColumnLetter, "condition_type")
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = Me.condition_type.Value
+    
+    'look for parentage field and populate it with "parent"
+    foundcolumn = AmazonColumn(LastColumnLetter, "parent_child")
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "parent"
+    
+    'look for variation theme field and populate it with "SizeName"
+    foundcolumn = AmazonColumn(LastColumnLetter, "variation_theme")
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "SizeName"
+
+End Sub
+
+Private Sub SetsArray(setArr)
     
     Dim cCont As control
     
     For Each cCont In Me.MultiPage1.Pages(2).Controls   '2 is the page number of Parentage page
         If TypeName(cCont) = "CheckBox" Then
             If cCont = True Then
-                If UBound(SetArr) > 0 Or SetArr(0) <> "" Then ReDim Preserve SetArr(UBound(SetArr) + 1)
-                SetArr(UBound(SetArr)) = cCont.Name
+                'add every checked box in Parentage page to array
+                If UBound(setArr) > 0 Or setArr(0) <> "" Then ReDim Preserve setArr(UBound(setArr) + 1)
+                setArr(UBound(setArr)) = cCont.Name
             End If
         End If
     Next
     
 End Sub
 
-Private Sub EnterControls(LastColumnLetter As String, ListingRow As Integer)
+Private Sub EnterControls(LastColumnLetter As String, listingrow As Integer, Optional setArr)
 
     Dim cCont As control
-    Dim FoundColumn As Integer
+    Dim foundcolumn As Integer
     
     'loop through controls and populate header with values user entered
     For Each cCont In Me.Controls
@@ -803,63 +896,63 @@ Private Sub EnterControls(LastColumnLetter As String, ListingRow As Integer)
         If Not TypeName(cCont) = "Label" And Not TypeName(cCont) = "MultiPage" And Not TypeName(cCont) = "CommandButton" And Not TypeName(cCont) = "Nothing" Then
             'Find the column number of the Control
             
-            FoundColumn = AmazonColumn(LastColumnLetter, cCont.Name)
+            foundcolumn = AmazonColumn(LastColumnLetter, cCont.Name)
             
             'some items on the userform are not in the Amazon Template, like the Reboxed checkbox
             'if field name is not found, FoundColumn will return 0, and can't have a 0th column
-            If FoundColumn > 0 Then Cells(ListingRow, FoundColumn).Value = cCont.Value
+            If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = cCont.Value
         End If
     Next cCont
 
 End Sub
 
-Private Sub EnterProductIDType(LastColumnLetter As String, ListingRow As Integer)
+Private Sub EnterProductIDType(LastColumnLetter As String, listingrow As Integer)
 
-    Dim FoundColumn As Integer
+    Dim foundcolumn As Integer
     
-    FoundColumn = AmazonColumn(LastColumnLetter, "external_product_id_type")
+    foundcolumn = AmazonColumn(LastColumnLetter, "external_product_id_type")
     
-    If FoundColumn > 0 Then Cells(ListingRow, FoundColumn).Value = "UPC"
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "UPC"
 
 End Sub
 
-Private Sub EnterFeedProductType(LastColumnLetter As String, ListingRow As Integer)
+Private Sub EnterFeedProductType(LastColumnLetter As String, listingrow As Integer)
 
-    Dim FoundColumn As Integer
+    Dim foundcolumn As Integer
     
-    FoundColumn = AmazonColumn(LastColumnLetter, "feed_product_type")
+    foundcolumn = AmazonColumn(LastColumnLetter, "feed_product_type")
     
-    If FoundColumn > 0 Then Cells(ListingRow, FoundColumn).Value = "autopart"
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "autopart"
 
 End Sub
 
-Private Sub EnterItemType(LastColumnLetter As String, ListingRow As Integer)
+Private Sub EnterItemType(LastColumnLetter As String, listingrow As Integer)
 
-    Dim FoundColumn As Integer
+    Dim foundcolumn As Integer
     
     'lookup the BTG value of the part type
     Set rst = MstrDb.Execute("SELECT BTGValue FROM AAIAPartTypes WHERE AAIAPartType=" & Chr(34) & Me.part_type_id.Value & Chr(34))
     rst.MoveFirst
     
     'find the column in the excel sheet with "item_type" in the second row to enter the BTG value
-    FoundColumn = AmazonColumn(LastColumnLetter, "item_type")
+    foundcolumn = AmazonColumn(LastColumnLetter, "item_type")
     
-    If FoundColumn > 0 Then Cells(ListingRow, FoundColumn).Value = rst.Fields("BTGValue").Value
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = rst.Fields("BTGValue").Value
     
     'close the query
     rst.Close
 
 End Sub
 
-Private Sub EnterBrand(LastColumnLetter As String, ListingRow As Integer)
+Private Sub EnterBrand(LastColumnLetter As String, listingrow As Integer)
 
-    Dim FoundColumn As Integer
+    Dim foundcolumn As Integer
     
     'brand
     If ListingMode = "Single" Then
-        FoundColumn = AmazonColumn(LastColumnLetter, "brand_name")
+        foundcolumn = AmazonColumn(LastColumnLetter, "brand_name")
         
-        If FoundColumn > 0 Then Cells(ListingRow, FoundColumn).Value = "AD Auto Parts"
+        If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "AD Auto Parts"
     Else
         'to be determined
         
@@ -867,7 +960,37 @@ Private Sub EnterBrand(LastColumnLetter As String, ListingRow As Integer)
 
 End Sub
 
-Private Sub EnterShippingTemplate(LastColumnLetter As String, ListingRow As Integer)
+Private Sub EnterPrice(LastColumnLetter As String, listingrow As Integer, setArr, i As Integer)
+
+    Dim foundcolumn As Integer
+    foundcolumn = AmazonColumn(LastColumnLetter, "standard_price")
+    
+    Cells(listingrow, foundcolumn).Value = Replace(setArr(i), "Setof", "") * Me.standard_price.Value
+
+End Sub
+
+Private Sub EnterPackageQauntity(LastColumnLetter As String, listingrow As Integer, Optional SetListing As Boolean, Optional setArr, Optional i As Integer)
+
+    Dim foundcolumn As Integer
+    
+    foundcolumn = AmazonColumn(LastColumnLetter, "item_package_quantity")
+    
+    If ListingMode = "Single" Then
+        'if SetListing is True, then user is listing sets. Calculate package quantity differently
+        If SetListing = True Then
+            'find out how to multiply this to find the number of items
+            Cells(listingrow, foundcolumn).Value = Replace(setArr(i), "Setof", "")
+        Else
+            Cells(listingrow, foundcolumn).Value = Me.item_package_quantity
+        End If
+    Else
+        'placeholder
+        
+    End If
+
+End Sub
+
+Private Sub EnterShippingTemplate(LastColumnLetter As String, listingrow As Integer)
 
     Dim weight_oz As Double
     Dim shiptempcol As Integer
@@ -876,7 +999,7 @@ Private Sub EnterShippingTemplate(LastColumnLetter As String, ListingRow As Inte
     shiptempcol = AmazonColumn(LastColumnLetter, "merchant_shipping_group_name")
     
     'if user entered "Weight-Based" for the shipping tmeplate, calculate and replace it with the correct template
-    If Cells(ListingRow, shiptempcol).Value = "Weight-Based" Then
+    If Cells(listingrow, shiptempcol).Value = "Weight-Based" Then
         'convert weight to ounces and multiply by package qauntity to find total weight of listing
         If Me.website_shipping_weight_unit_of_measure = "LB" Then
             weight_oz = Me.website_shipping_weight.Value * 16 * Me.item_package_quantity.Value
@@ -888,7 +1011,7 @@ Private Sub EnterShippingTemplate(LastColumnLetter As String, ListingRow As Inte
         Select Case weight_oz
         Case Is <= 13   '13 ounces or less
             '13 ounce template
-            Cells(ListingRow, shiptempcol).Value = "13 oz. Template"
+            Cells(listingrow, shiptempcol).Value = "13 oz. Template"
         
         Case Is <= 128  'between 13 oz and 8 lb.
             '1-8 lb. Template
@@ -900,92 +1023,100 @@ Private Sub EnterShippingTemplate(LastColumnLetter As String, ListingRow As Inte
             End If
             
             'Concatenate the shipping template name
-            Cells(ListingRow, shiptempcol).Value = RoundUp(weight_oz) & " lb. Template"
+            Cells(listingrow, shiptempcol).Value = RoundUp(weight_oz) & " lb. Template"
         
         Case Is <= 160  'between 8 lb. and 10 lb.
             '9-10 lb. Template
-            Cells(ListingRow, shiptempcol).Value = "9-10 lb. Template"
+            Cells(listingrow, shiptempcol).Value = "9-10 lb. Template"
         
         Case Is <= 192  'between 10 and 12 lb.
             '11-12 lb. Template
-            Cells(ListingRow, shiptempcol).Value = "11-12 lb. Template"
+            Cells(listingrow, shiptempcol).Value = "11-12 lb. Template"
         
         Case Is <= 224  'between 12 and 14 lb.
             '13-14 lb. Template
-            Cells(ListingRow, shiptempcol).Value = "13-14 lb. Template"
+            Cells(listingrow, shiptempcol).Value = "13-14 lb. Template"
         
         Case Is <= 288  'between 14 and 18 lb.
             '15-18 lb. Template
-            Cells(ListingRow, shiptempcol).Value = "15-18 lb. Template"
+            Cells(listingrow, shiptempcol).Value = "15-18 lb. Template"
         
         Case Is <= 304  'between 18 and 19 lb.
             '19 lb. Template
-            Cells(ListingRow, shiptempcol).Value = "19 lb. Template"
+            Cells(listingrow, shiptempcol).Value = "19 lb. Template"
             
         Case Else   'over 19 pounds
             '20-45 lb. Template
-            Cells(ListingRow, shiptempcol).Value = "20-45 lb. Template"
+            Cells(listingrow, shiptempcol).Value = "20-45 lb. Template"
         End Select
     Else
         'If user entered Prime for shipping template, replace with Prime shipping template
-        Cells(ListingRow, shiptempcol).Value = Me.merchant_shipping_group_name
+        Cells(listingrow, shiptempcol).Value = Me.merchant_shipping_group_name
     End If
     
 End Sub
 
-Private Sub EnterDiscontinued(LastColumnLetter As String, ListingRow As Integer)
+Private Sub EnterDiscontinued(LastColumnLetter As String, listingrow As Integer)
 
-    Dim FoundColumn As Integer
+    Dim foundcolumn As Integer
     
-    FoundColumn = AmazonColumn(LastColumnLetter, "is_discontinued_by_manufacturer")
+    foundcolumn = AmazonColumn(LastColumnLetter, "is_discontinued_by_manufacturer")
         
     'if field was found and the user left is_discontinued_by_manufacturer checkbox blank then change to null
     If Me.is_discontinued_by_manufacturer = False Then
-        If FoundColumn > 0 Then Cells(ListingRow, FoundColumn).Value = ""
+        If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = ""
     End If
 
 End Sub
 
-Private Sub EnterNumberofItems(LastColumnLetter As String, ListingRow As Integer)
+Private Sub EnterNumberofItems(LastColumnLetter As String, listingrow As Integer, Optional SetListing As Boolean, Optional setArr, Optional i As Integer)
 
-    Dim FoundColumn As Integer
+    Dim foundcolumn As Integer
     
-    FoundColumn = AmazonColumn(LastColumnLetter, "number_of_items")
-    If FoundColumn > 0 Then Cells(ListingRow, FoundColumn).Value = Me.item_package_quantity
+    foundcolumn = AmazonColumn(LastColumnLetter, "number_of_items")
+    
+    'if SetListing is True, then user is listing sets. Calculate number of items differently
+    If SetListing = True Then
+        'find out how to multiply this to find the number of items
+        Cells(listingrow, foundcolumn).Value = Replace(setArr(i), "Setof", "") 'find column letter first
+    Else
+        foundcolumn = AmazonColumn(LastColumnLetter, "number_of_items")
+        If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = Me.item_package_quantity
+    End If
 
 End Sub
 
-Private Sub EnterQuantity(LastColumnLetter As String, ListingRow As Integer)
+Private Sub EnterQuantity(LastColumnLetter As String, listingrow As Integer)
 
-    Dim FoundColumn As Integer
+    Dim foundcolumn As Integer
     
-    FoundColumn = AmazonColumn(LastColumnLetter, "quantity")
+    foundcolumn = AmazonColumn(LastColumnLetter, "quantity")
         
-    If FoundColumn > 0 Then Cells(ListingRow, FoundColumn).Value = 1    'Finale takes care of quantity listed
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = 1    'Finale takes care of quantity listed
 
 End Sub
 
-Private Sub EnterTaxCode(LastColumnLetter As String, ListingRow As Integer)
+Private Sub EnterTaxCode(LastColumnLetter As String, listingrow As Integer)
 
-    Dim FoundColumn As Integer
+    Dim foundcolumn As Integer
     
-    FoundColumn = AmazonColumn(LastColumnLetter, "product_tax_code")
+    foundcolumn = AmazonColumn(LastColumnLetter, "product_tax_code")
         
-    If FoundColumn > 0 Then Cells(ListingRow, FoundColumn).Value = "A_GEN_TAX"
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "A_GEN_TAX"
 
 End Sub
 
-Private Sub EnterHandlingTime(LastColumnLetter As String, ListingRow As Integer)
+Private Sub EnterHandlingTime(LastColumnLetter As String, listingrow As Integer)
 
-    Dim FoundColumn As Integer
+    Dim foundcolumn As Integer
     
-    FoundColumn = AmazonColumn(LastColumnLetter, "fulfillment_latency")
+    foundcolumn = AmazonColumn(LastColumnLetter, "fulfillment_latency")
         
-    If FoundColumn > 0 Then Cells(ListingRow, FoundColumn).Value = 1   'should always be 1 to meet Amazon's standards
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = 1   'should always be 1 to meet Amazon's standards
 
 End Sub
 
-Private Sub KeyProductFeatures(LastColumnLetter As String, ListingRow As Integer)
+Private Sub KeyProductFeatures(LastColumnLetter As String, listingrow As Integer)
 
     Dim i As Integer
     Set rst = MstrDb.Execute("SELECT * FROM KeyProductFeatures WHERE ([Manufacturer]=" & Chr(34) & Me.Manufacturer.Value & Chr(34) & " AND [PartType]=" & Chr(34) & Me.part_type_id.Value & Chr(34) & ")")
@@ -996,12 +1127,12 @@ Private Sub KeyProductFeatures(LastColumnLetter As String, ListingRow As Integer
     KPFColumn = AmazonColumn(LastColumnLetter, "bullet_point1")
     
     For i = KPFColumn To KPFColumn + 4
-        Cells(ListingRow, i).Value = rst.Fields("KeyProductFeature" & i).Value
+        Cells(listingrow, i).Value = rst.Fields("KeyProductFeature" & i).Value
     Next i
 
 End Sub
 
-Private Sub EnterDimensionsUnitOfMeasure(LastColumnLetter As String, ListingRow As Integer)
+Private Sub EnterDimensionsUnitOfMeasure(LastColumnLetter As String, listingrow As Integer)
 
     Dim LengthColumn As Integer
     Dim HeightColumn As Integer
@@ -1015,28 +1146,78 @@ Private Sub EnterDimensionsUnitOfMeasure(LastColumnLetter As String, ListingRow 
     MeasureColumn = AmazonColumn(LastColumnLetter, "item_dimensions_unit_of_measure")
     
     'If any item dimension is not null, the enter IN into the unit of measure field
-    If Cells(ListingRow, LengthColumn).Value <> "" Or Cells(ListingRow, HeightColumn).Value <> "" Or Cells(ListingRow, WidthColumn).Value <> "" Then
-        Cells(ListingRow, MeasureColumn).Value = "IN"
+    If Cells(listingrow, LengthColumn).Value <> "" Or Cells(listingrow, HeightColumn).Value <> "" Or Cells(listingrow, WidthColumn).Value <> "" Then
+        Cells(listingrow, MeasureColumn).Value = "IN"
     End If
 
 End Sub
 
-Private Sub EnterProp65(LastColumnLetter As String, ListingRow As Integer)
-
-    Dim FoundColumn As Integer
+Private Sub EnterWeight(LastColumnLetter As String, listingrow As Integer, setArr, i As Integer)
     
-    FoundColumn = AmazonColumn(LastColumnLetter, "california_proposition_65_compliance_type")
-        
-    If FoundColumn > 0 Then Cells(ListingRow, FoundColumn).Value = "Passenger or Off Road Vehicle"   'All our items are for Passenger or Off Road Vehicle
+    Dim SetSize As Integer
+    SetSize = Replace(setArr(i), "Setof", "")
+    
+    Dim WeightOz As Double
+    Dim WeightLb As Double
+    
+    'find weight of a single
+    If Me.website_shipping_weight_unit_of_measure.Value = "LB" Then
+        WeightOz = Me.website_shipping_weight.Value * 16
+        WeightLb = Me.website_shipping_weight.Value
+    Else
+        WeightOz = Me.website_shipping_weight.Value
+        WeightLb = Me.website_shipping_weight.Value / 16
+    End If
+    
+    'enter the value
+    Dim weightfield As Integer
+    Dim unitfield As Integer
+    weightfield = AmazonColumn(LastColumnLetter, "website_shipping_weight")
+    unitfield = AmazonColumn(LastColumnLetter, "website_shipping_weight_unit_of_measure")
+    
+    'Enter the weight amount
+    If weightfield > 0 Then
+        If WeightLb * SetSize >= 1 Then
+            'if weight is over a pound, use LB
+            Cells(listingrow, weightfield).Value = Round(WeightLb * SetSize, 2)
+            Cells(listingrow, unitfield).Value = "LB"
+        Else
+            'if weight is under a pound, use OZ
+            Cells(listingrow, weightfield).Value = Round(WeightOz * SetSize, 2)
+            Cells(listingrow, unitfield).Value = "OZ"
+        End If
+    End If
 
 End Sub
 
-Private Sub EnterWarranty(LastColumnLetter As String, ListingRow As Integer)
+Private Sub EnterProp65(LastColumnLetter As String, listingrow As Integer)
+
+    Dim foundcolumn As Integer
+    
+    foundcolumn = AmazonColumn(LastColumnLetter, "california_proposition_65_compliance_type")
+        
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "Passenger or Off Road Vehicle"   'All our items are for Passenger or Off Road Vehicle
+
+End Sub
+
+Private Sub EnterWarranty(LastColumnLetter As String, listingrow As Integer)
 
     Dim rFindwar As Range
     Dim rFindwarTyp As Range
+    Dim foundcolumn As Integer
     
-    
+    foundcolumn = AmazonColumn(LastColumnLetter, "mfg_warranty_description_type")
+        
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "Parts"
+
+End Sub
+
+Private Sub EnterSizeName(LastColumnLetter As String, listingrow As Integer, setArr, i As Integer)
+
+    Dim foundcolumn As Integer
+    foundcolumn = AmazonColumn(LastColumnLetter, "size_name")
+        
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = Replace(setArr(i), "Setof", "Set of ")
 
 End Sub
 
