@@ -137,20 +137,20 @@ End Sub
 
 Private Sub KeepButton_Click()
 
-    Dim A As Integer
+    Dim a As Integer
     Dim B As Integer
     Dim numrows As Integer
     
     'turn screen updating off
     Application.ScreenUpdating = False
     
-    A = WorksheetFunction.Min(Me.MinRow.Value, Me.MaxRow.Value) 'set a to min
+    a = WorksheetFunction.Min(Me.MinRow.Value, Me.MaxRow.Value) 'set a to min
     B = WorksheetFunction.Max(Me.MinRow.Value, Me.MaxRow.Value) 'set b to max
     numrows = CountRows("B:B")  'Column B is Product ID column
     
-    If A > 2 Then
-        Rows("2:" & A - 1).EntireRow.Delete       'delete rows from 1 to a if user wants to remove some top rows
-        Rows(B - A + 3 & ":" & CountRows("B:B")).EntireRow.Delete
+    If a > 2 Then
+        Rows("2:" & a - 1).EntireRow.Delete       'delete rows from 1 to a if user wants to remove some top rows
+        Rows(B - a + 3 & ":" & CountRows("B:B")).EntireRow.Delete
     Else
         Rows(B + 1 & ":" & CountRows("B:B")).EntireRow.Delete   'delete from below b to end of sheet
     End If

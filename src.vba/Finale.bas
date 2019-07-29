@@ -5,6 +5,8 @@ Public Sub FinaleProductsMain()
     'open FinaleProducts userform
     FinaleProducts.Show
     
+'''''for some reason none of this code runs after clicking the button in the FinaleProducts userform
+    
     'if FinaleFields array is empty, user canceled the operation. exit sub
     If IsArrayAllocated(FinaleFields) = False Then Exit Sub
     
@@ -12,7 +14,7 @@ Public Sub FinaleProductsMain()
     Application.ScreenUpdating = False
 
     'open or create Finale Products worksheet
-    Call PrepWorksheet("Finale Products")               'WorksheetConnections Module
+    Call PrepWorksheet("Finale Products")               'TableConnections Module
         
     'Fill in the headers
     FinaleProductsAddHeaders
@@ -37,7 +39,7 @@ Public Sub FinaleStockTakeMain()
     SheetName = "Finale Stock Take"
     
     'open or create Stock Take worksheet
-    Call PrepWorksheet(SheetName)           'WorksheetConnections Module
+    Call PrepWorksheet(SheetName)           'TableConnections Module
     
     'Fill in the headers
     FinaleStockTakeAddHeaders
@@ -53,7 +55,7 @@ Public Sub FinaleBoMMain()
     SheetName = "Finale Bill of Materials"
     
     'open or create Bill of Materials worksheet
-    Call PrepWorksheet(SheetName)           'WorksheetConnections Module
+    Call PrepWorksheet(SheetName)           'TableConnections Module
     
     'Fill in the headers
     FinaleBoMAddHeaders
@@ -69,7 +71,7 @@ Public Sub FinaleLookupsMain()
     SheetName = "Finale Lookups"
     
     'open or create Lookups worksheet
-    Call PrepWorksheet(SheetName)           'WorksheetConnections Module
+    Call PrepWorksheet(SheetName)           'TableConnections Module
     
     'Fill in the headers
     FinaleLookupsAddHeaders
