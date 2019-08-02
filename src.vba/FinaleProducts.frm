@@ -172,8 +172,10 @@ Private Sub LoadSelectedFields()
 
     Dim i As Integer
     Dim j As Integer
+    
     For i = 0 To Me.FieldListBox.ListCount - 1
         For j = 0 To UBound(CatFieldArr())
+            'loop through every checkbox and mark True or False based on the saved values in CatFieldArr
             If CatFieldArr(j, 0) = Me.FieldListBox.List(i) Then
                 Me.FieldListBox.Selected(i) = CatFieldArr(j, 2)
                 GoTo Exit_Loop
@@ -186,8 +188,14 @@ End Sub
 
 Private Sub SubmitBtn_Click()
     
+    'Update the CatFieldArr array
+    SaveSelectedFields
+    
+    'rename sheet/ add sheet if it doesn't exist
+    Call PrepWorksheet("Finale Products")
+    
     'add Product id first
-    Range("A1").Value = "Product id"    'hard coded for now, will update to use default fields in the future
+    Range("A1").Value = "Product ID"    'hard coded for now, will update to use default fields in the future
     
     'loop through CatFieldArr and add each item with value True as header
     Dim i As Integer
@@ -204,12 +212,9 @@ Private Sub SubmitBtn_Click()
     Dim lastcolumn As String
     lastcolumn = NumberToColumn(CountColumns(Range("1:1")))
     Range("A:" & lastcolumn).EntireColumn.AutoFit
-    
     Range("A1").Select
     
-    'rename sheet
-    Call PrepWorksheet("Finale Products")
-    
-    FinaleProducts.Hide
+    'Unload the UserForm
+    Unload Me
 
 End Sub

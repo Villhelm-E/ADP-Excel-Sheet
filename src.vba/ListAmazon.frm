@@ -733,7 +733,7 @@ Private Sub ListSingle(listingrow As Integer, LastColumnLetter As String, IsSet 
     Call EnterBrand(LastColumnLetter, listingrow)
     
     'Price
-    Call EnterPrice(LastColumnLetter, listingrow, setArr, i)
+    Call EnterPrice(LastColumnLetter, listingrow, IsSet, setArr, i)
     
     'Package Quantity
     Call EnterPackageQauntity(LastColumnLetter, listingrow)
@@ -960,12 +960,16 @@ Private Sub EnterBrand(LastColumnLetter As String, listingrow As Integer)
 
 End Sub
 
-Private Sub EnterPrice(LastColumnLetter As String, listingrow As Integer, setArr, i As Integer)
+Private Sub EnterPrice(LastColumnLetter As String, listingrow As Integer, IsSet As Boolean, setArr, i As Integer)
 
     Dim foundcolumn As Integer
     foundcolumn = AmazonColumn(LastColumnLetter, "standard_price")
     
-    Cells(listingrow, foundcolumn).Value = Replace(setArr(i), "Setof", "") * Me.standard_price.Value
+    If IsSet = True Then
+        Cells(listingrow, foundcolumn).Value = Replace(setArr(i), "Setof", "") * Me.standard_price.Value
+    Else
+        Cells(listingrow, foundcolumn).Value = Me.standard_price.Value
+    End If
 
 End Sub
 
