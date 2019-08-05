@@ -79,7 +79,7 @@ Public Function RoundUp(Number As Double) As Double
 End Function
 
 'Function is meant to be used in Amazon Template
-Public Function AmazonColumn(LastColumnLetter As String, SearchItem As String) As Integer
+Public Function AmazonColumn(lastcolumnletter As String, SearchItem As String) As Integer
 
     Dim rFind As Range
     Dim R As Range
@@ -87,7 +87,7 @@ Public Function AmazonColumn(LastColumnLetter As String, SearchItem As String) A
     NameRow = 3
     
     'define range to search
-    Set R = Range("A" & NameRow & ":" & LastColumnLetter & NameRow)
+    Set R = Range("A" & NameRow & ":" & lastcolumnletter & NameRow)
     
     'search through range to find column of where field name is found
     Set rFind = R.Find(SearchItem, , , xlWhole, , , False, , False)

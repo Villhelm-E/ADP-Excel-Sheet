@@ -90,14 +90,14 @@ Public Sub AmazonHeaders()
     Next i
     
     
-    Dim LastColumnLetter As String
+    Dim lastcolumnletter As String
     Dim ColumnCount As Integer
     
     'Save the number and letter of the last column
-    LastColumnLetter = NumberToColumn(CountColumns(Range(LabelRow & ":" & LabelRow)))   'LabelRow is global variable
+    lastcolumnletter = NumberToColumn(CountColumns(Range(LabelRow & ":" & LabelRow)))   'LabelRow is global variable
     
     'Format the UPC column to font size 14 and text so it doesn't show as scientific notation
-    Call InitialFormatHeaders(LastColumnLetter)
+    Call InitialFormatHeaders(lastcolumnletter)
     
     'Color the fields
     HeaderColors
@@ -117,14 +117,14 @@ Private Sub FillAmazonVariables()
 
 End Sub
 
-Private Sub InitialFormatHeaders(LastColumnLetter As String)
+Private Sub InitialFormatHeaders(lastcolumnletter As String)
 
     'format UPC column so it doesn't show scientific notation
     Dim AmznCol As Integer
     Dim col As Integer
     Dim ColLet As String
     
-    col = AmazonColumn(LastColumnLetter, "external_product_id")
+    col = AmazonColumn(lastcolumnletter, "external_product_id")
     ColLet = NumberToColumn(col)
     
     Range(ColLet & ":" & ColLet).NumberFormat = "@"
