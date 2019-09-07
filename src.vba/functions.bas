@@ -28,7 +28,7 @@ End Function
 'Function takes a range as input and returns the last row in range
 Public Function LastRow(col As String) As Long
     
-    LastRow = ActiveSheet.Cells(ActiveSheet.Rows.count, col).End(xlUp).Row
+    LastRow = ActiveSheet.Cells(ActiveSheet.Rows.Count, col).End(xlUp).Row
 
 End Function
 
@@ -94,5 +94,24 @@ Public Function AmazonColumn(lastcolumnletter As String, SearchItem As String) A
     If Not rFind Is Nothing Then
         AmazonColumn = rFind.Column
     End If
+
+End Function
+
+Public Function CHECKSUM(Num As String) As String
+
+    Dim NumLength As Integer
+    NumLength = Len(Num)
+    Dim sum As Integer
+    Dim i As Integer
+    
+    For i = NumLength To 1 Step -2
+        sum = sum + Mid(Num, i, 1) * 3
+    Next i
+    
+    For i = (NumLength - 1) To 1 Step -2
+        sum = sum + Mid(Num, i, 1)
+    Next i
+    
+    CHECKSUM = Num & WorksheetFunction.Ceiling(sum, 10) - sum
 
 End Function

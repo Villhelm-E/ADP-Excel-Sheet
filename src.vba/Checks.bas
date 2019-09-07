@@ -209,24 +209,17 @@ End Function
 
 Public Function CheckUPC() As Boolean
 
-    'check to see if every column except column A is empty
-    If CountRows("A:A") > 0 And CountRows("B:D") = 0 Then
-        'If column A is only column with values
+    If Range("A1").Value = "Action" And Range("B1").Value = "GS1CompanyPrefix" And Range("C1").Value = "GTIN" And Range("D1").Value = "PackagingLevel" And _
+    Range("E1").Value = "Description" And Range("F1").Value = "SKU" And Range("G1").Value = "BrandName" And Range("H1").Value = "Status" And _
+    Range("I1").Value = "IsVariable" And Range("J1").Value = "IsPurchasable" And Range("K1").Value = "Certified" And Range("L1").Value = "Height" And _
+    Range("M1").Value = "Width" And Range("N1").Value = "Depth" And Range("O1").Value = "DimensionMeasure" And Range("P1").Value = "GrossWeight" And _
+    Range("Q1").Value = "NetWeight" And Range("R1").Value = "WeightMeasure" And Range("S1").Value = "Comments" And Range("T1").Value = "CountryOfOrigin" And _
+    Range("U1").Value = "ChildGTINs" And Range("V1").Value = "Quantity" And Range("W1").Value = "SubBrandName" And Range("X1").Value = "ProductDescriptionShort" And _
+    Range("Y1").Value = "LabelDescription" And Range("Z1").Value = "NetContent1Count" And Range("AA1").Value = "NetContent1UnitOfMeasure" And Range("AB1").Value = "NetContent2Count" And _
+    Range("AC1").Value = "NetContent2UnitOfMeasure" And Range("AD1").Value = "NetContent3Count" And Range("AE1").Value = "NetContent3UnitOfMeasure" And _
+    Range("AF1").Value = "GlobalProductClassification" And Range("AG1").Value = "ImageURL" And Range("AH1").Value = "TargetMarket" Then
         CheckUPC = True
-    Else
-        'if any column besides column A has values, make false
-        CheckUPC = False
-        Exit Function
     End If
-    
-    Dim i As Integer
-    'loop through every row in column A
-    For i = 1 To CountRows("A:A")
-        If IsNumeric(Cells(i, 1)) = False Or Len(Cells(i, 1)) <> 12 Then
-            'if any row in column A is not a number, make false
-            CheckUPC = False
-        End If
-    Next i
 
 End Function
 

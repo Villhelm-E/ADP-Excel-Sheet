@@ -142,7 +142,7 @@ Public Sub ConfirmInvMain()
     ADPRange.Copy Destination:=ConfirmedRange
     
     'Close Confirmed Inventory workbook and save
-    Confirmed.Close SaveChanges:=True
+    Confirmed.Close savechanges:=True
     
     'Select cell A1
     Range("A1").Select

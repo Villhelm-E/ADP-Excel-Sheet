@@ -161,6 +161,11 @@ Private Sub ShipstationFinalFormat(numrows As Integer)
     
     Call RenameSheet("Shipstation", numrows)
     
+    Range("A1").Value = "Shipped Date"
+    Range("C1").Value = "Ship To"
+    Range("D1").Value = "Order Total"
+    Range("E1").Value = "Shipping Cost"
+    
     Range("A1").Select
 
 End Sub

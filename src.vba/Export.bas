@@ -4,15 +4,15 @@ Public Sub XLSX()
 
     Dim FlSv As Variant
     Dim MyFile As String
-    Dim Sh As Worksheet
+    Dim sh As Worksheet
     Dim currentsheetname As Variant
     
     'save current sheet's name to variable
     currentsheetname = Application.ActiveSheet.Name
 
     'activate current sheet and copy it
-    Set Sh = Sheets(currentsheetname)
-    Sh.Copy
+    Set sh = Sheets(currentsheetname)
+    sh.Copy
     'add extension to sheet name
     MyFile = currentsheetname & ".xlsx"
     
@@ -40,15 +40,15 @@ Public Sub CSV()
 
     Dim FlSv As Variant
     Dim MyFile As String
-    Dim Sh As Worksheet
+    Dim sh As Worksheet
     Dim currentsheetname As Variant
     
     'save current sheet's name to variable
     currentsheetname = Application.ActiveSheet.Name
 
     'activate current sheet and copy it
-    Set Sh = Sheets(currentsheetname)
-    Sh.Copy
+    Set sh = Sheets(currentsheetname)
+    sh.Copy
     'add extension to sheet name
     MyFile = currentsheetname & ".csv"
     
@@ -76,15 +76,15 @@ Public Sub TXT()
 
     Dim FlSv As Variant
     Dim MyFile As String
-    Dim Sh As Worksheet
+    Dim sh As Worksheet
     Dim currentsheetname As Variant
     
     'save current sheet's name to variable
     currentsheetname = Application.ActiveSheet.Name
 
     'activate current sheet and copy it
-    Set Sh = Sheets(currentsheetname)
-    Sh.Copy
+    Set sh = Sheets(currentsheetname)
+    sh.Copy
     'add extension to sheet name
     MyFile = currentsheetname & ".txt"
     
@@ -118,19 +118,28 @@ Public Sub EmailMain()
     'Turn off screen updating
     Application.ScreenUpdating = False
     
-    'Create a temporary file in your current directory that uses the name of the sheet as the filename
-    LFileName = ActiveSheet.Name
+    'name email attachments based on how many sheets user has selected
+    If ActiveWindow.SelectedSheets.Count > 1 Then
+        LFileName = "Workbook Attachment"
+    Else
+        LFileName = ActiveSheet.Name
+    End If
     
+    'validate attachment name
     If NameValid(LFileName) = True Then
-        'Copy the active worksheet and save to a temporary workbook
-        ActiveSheet.Copy
+        
+        'copy all selected sheets to new temp workbook
+        ActiveWindow.SelectedSheets.Copy
         Set LWorkbook = ActiveWorkbook
         
         On Error Resume Next
+        
         'delete the file if it already exists
         Kill LFileName
+        
         On Error GoTo 0
-        'save temporary file
+        
+        'save the temporary file
         LWorkbook.SaveAs FileName:=LFileName
         
         'create an outlook object and new mail message
@@ -141,7 +150,7 @@ Public Sub EmailMain()
         With oMail
             '.To = "user@yahoo.com"
             .Subject = LFileName
-            '.body = "This is the body of the message." & vbCrLf & vbCrLf & "Attached is the file"
+            '.body = "This is the body of the message."
             .Attachments.Add LWorkbook.FullName
             .Display
         End With
@@ -149,14 +158,15 @@ Public Sub EmailMain()
         'delete the temporary file and close temporary workbook
         LWorkbook.ChangeFileAccess Mode:=xlReadOnly
         Kill LWorkbook.FullName
-        LWorkbook.Close SaveChanges:=False
+        LWorkbook.Close savechanges:=False
         
-        'turn screen updating back on
+        'turn screen updating back on and clear objects
         Application.ScreenUpdating = True
         Set oMail = Nothing
         Set oApp = Nothing
+        
     Else
-        MsgBox "File Name is invalid. Please rename sheet."
+        MsgBox "The file name is invalid. Please rename attachment."
     End If
 
 End Sub

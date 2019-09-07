@@ -65,9 +65,6 @@ Public Sub RibbonCategories()
     ElseIf CheckACES = True Then
         'check if formatted fitments
         Tag = "*a*"                                     'enable To Database and To Sixbit buttons
-    ElseIf CheckUPC = True Then
-        'check if new UPC list
-        Tag = "*l*"
     ElseIf CheckDropship <> "" Then
         'check if Dropship report
         Tag = "*m*"

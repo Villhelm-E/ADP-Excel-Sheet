@@ -20,7 +20,7 @@ Public Sub PrepWorksheet(SheetName As String)
             ActiveSheet.Name = SheetName
         Else
             'if current worksheet is not blank, add worksheet to the end and name it
-            With Sheets.Add(, Sheets(Sheets.count))
+            With Sheets.Add(, Sheets(Sheets.Count))
                 .Name = SheetName
             End With
         End If
@@ -42,7 +42,7 @@ Public Sub RenameSheet()
     Set ws = ActiveWorkbook.ActiveSheet
     
     'set WS_Count equal to the number of worksheets in the active workbook
-    WS_Count = ActiveWorkbook.Worksheets.count
+    WS_Count = ActiveWorkbook.Worksheets.Count
     
     'begin the loop
     For i = 1 To WS_Count

@@ -15,7 +15,7 @@ Private Sub Workbook_Open()
 End Sub
 
 'Run whenever any sheet changes
-Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
+Private Sub Workbook_SheetChange(ByVal sh As Object, ByVal Target As Range)
     
     'If code writes anything to worksheet, screenupdating will be turned off bypassing this subroutine
     'will only update ribbon if code isn't making changes to sheet
@@ -26,7 +26,7 @@ Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
 End Sub
 
 'Run whenever user switches sheet
-Private Sub Workbook_SheetActivate(ByVal Sh As Object)
+Private Sub Workbook_SheetActivate(ByVal sh As Object)
     
     RibbonCategories    'Ribbon Module
 

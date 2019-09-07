@@ -226,7 +226,7 @@ Private Sub UserForm_Initialize()
     Me.Top = Application.Top + (0.5 * Application.Height) - (0.5 * Me.Height)
     
     'count number of pages and save to global variable PageCount
-    PageCount = MultiPage1.Pages.count - 1  'subtract 1 to account for first page being 0
+    PageCount = MultiPage1.Pages.Count - 1  'subtract 1 to account for first page being 0
     
     'rename userform caption
     ListAmazon.Caption = "List on Amazon (" & MultiPage1.SelectedItem.Caption & ")"
@@ -280,7 +280,7 @@ Private Sub MultiPage1_Change()
         PartInfoSub
     End If
     
-    'If user is on PArentage page run
+    'If user is on Parentage page run
     If ListAmazon.Caption Like "*Parentage*" Then
         Me.parent_sku.Value = GenSKU(True)
     End If
@@ -768,7 +768,7 @@ Private Sub ListSingle(listingrow As Integer, lastcolumnletter As String, IsSet 
     'warranty
     Call EnterWarranty(lastcolumnletter, listingrow)
     
-    'Size Name
+    'Overwrite fields (populated by EnterControls sub) that change for sets
     If IsSet = True Then
         'Weight
         Call EnterWeight(lastcolumnletter, listingrow, SetArr, i)
@@ -791,6 +791,25 @@ Private Sub ListSingle(listingrow As Integer, lastcolumnletter As String, IsSet 
         
         'variation theme
         If AmazonColumn(lastcolumnletter, "parent_child") > 0 Then Cells(listingrow, AmazonColumn(lastcolumnletter, "variation_theme")).Value = "sizeName"
+        
+        'title
+        
+        
+        'description
+        
+        
+        'price
+        
+        
+        'retail price
+        
+        
+        'item dimensions
+        
+        
+        'warranty
+        
+        
     End If
 
 End Sub

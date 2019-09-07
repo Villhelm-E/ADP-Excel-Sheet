@@ -66,7 +66,7 @@ Public Function UpdateFeVersion(ThisVersion As String)
             destBook.Save
             
             'Close the old workbook
-            currentbook.Close SaveChanges:=True
+            currentbook.Close savechanges:=True
         End If
     Else
         GoTo ExitProc
@@ -104,14 +104,14 @@ Private Sub CopySheets(currentbook As Workbook, destBook As Workbook)
     Dim oldName As String
     
     'save number of sheets in new workbook
-    sheetIndex = destBook.Sheets.count
+    sheetIndex = destBook.Sheets.Count
     
     'loop through current workbook sheets
     For Each currentsheet In currentbook.Worksheets
         On Error GoTo Exit_Loop
         
         'loop through worksheets in new workbook
-        For i = 1 To Worksheets.count
+        For i = 1 To Worksheets.Count
             'if the worksheet already exists, set exists to true and end the loop
             If currentbook.Sheets(i).Name = currentsheet.Name Then
                 exists = True

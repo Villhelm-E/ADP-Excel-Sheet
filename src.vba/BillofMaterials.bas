@@ -26,7 +26,7 @@ Private Sub DeleteEmpty()
     
     'Find the last non-blank cell in column D(4)
     Dim lRow As Long
-    lRow = Cells(Rows.count, 4).End(xlUp).Row
+    lRow = Cells(Rows.Count, 4).End(xlUp).Row
     
     'save range to variable
     Dim R As Range, i As Long
@@ -44,7 +44,7 @@ Private Sub RepeatProductID()
 
     'find last row in column D(4)
     Dim lRow As Long
-    lRow = Cells(Rows.count, 4).End(xlUp).Row
+    lRow = Cells(Rows.Count, 4).End(xlUp).Row
     
     'loop
     Dim i As Integer
