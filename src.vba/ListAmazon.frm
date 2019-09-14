@@ -4,6 +4,45 @@ Option Explicit
 Public ListingMode As String
 Public Incomplete As Boolean
 
+Private Sub UserForm_Initialize()
+
+    'position the userform
+    Me.StartUpPosition = 0
+    Me.Left = Application.Left + (0.5 * Application.Width) - (0.5 * Me.Width)
+    Me.Top = Application.Top + (0.5 * Application.Height) - (0.5 * Me.Height)
+    
+    'count number of pages and save to global variable PageCount
+    PageCount = MultiPage1.Pages.Count - 1  'subtract 1 to account for first page being 0
+    
+    'rename userform caption
+    ListAmazon.Caption = "List on Amazon (" & MultiPage1.SelectedItem.Caption & ")"
+    
+    'Font size
+    Me.NextPage.Font.Size = 11
+
+    'disable back button
+    Me.PreviousPage.Enabled = False
+    
+    'go to first page
+    MultiPage1.Value = 0
+    
+    'hide tabs from multipage, to look cleaner
+    MultiPage1.Style = fmTabStyleNone
+    
+    'populate combo boxes
+    comboBoxes
+    
+    'Assume the part is New
+    Me.condition_type.Value = "New"
+    
+    'Assume the part is vehicle specific
+    Me.fit_type.Value = "Vehicle Specific"
+    
+    'Adds asterisk to required fields
+    RequiredFields
+
+End Sub
+
 Private Sub brand_name_Change()
 
     If Me.brand_name.Value <> "" Then
@@ -140,7 +179,7 @@ End Sub
 
 Private Sub standard_price_Change()
 
-    If Me.standard_price.Value = "" Then
+    If Me.standard_price.Value = "" Or IsNumeric(Me.standard_price.Value) = False Then
         Me.PriceLabel.ForeColor = RGB(255, 0, 0)
     Else
         Me.PriceLabel.ForeColor = RGB(0, 0, 0)
@@ -218,44 +257,6 @@ Private Sub UpdateListing_Click()
 
 End Sub
 
-Private Sub UserForm_Initialize()
-
-    'position the userform
-    Me.StartUpPosition = 0
-    Me.Left = Application.Left + (0.5 * Application.Width) - (0.5 * Me.Width)
-    Me.Top = Application.Top + (0.5 * Application.Height) - (0.5 * Me.Height)
-    
-    'count number of pages and save to global variable PageCount
-    PageCount = MultiPage1.Pages.Count - 1  'subtract 1 to account for first page being 0
-    
-    'rename userform caption
-    ListAmazon.Caption = "List on Amazon (" & MultiPage1.SelectedItem.Caption & ")"
-    
-    'Font size
-    Me.NextPage.Font.Size = 11
-
-    'disable back button
-    Me.PreviousPage.Enabled = False
-    
-    'go to first page
-    MultiPage1.Value = 0
-    
-    'hide tabs from multipage, to look cleaner
-    MultiPage1.Style = fmTabStyleNone
-    
-    'populate combo boxes
-    comboBoxes
-    
-    'Assume the part is New
-    Me.condition_type.Value = "New"
-    
-    'Assume the part is vehicle specific
-    Me.fit_type.Value = "Vehicle Specific"
-    
-    RequiredFields
-
-End Sub
-
 Private Sub MultiPage1_Change()
 
     'decide when to enable or disable the Previous page button
@@ -292,7 +293,7 @@ Private Sub MultiPage1_Change()
     
     'If user is on second page change the caption of the back/cancel button
     If MultiPage1.Value = 1 Then
-        Me.PreviousPage.Caption = "Cancel Listing"
+        Me.PreviousPage.Caption = "Start Over"
     Else
         Me.PreviousPage.Caption = "Back"
     End If
@@ -304,25 +305,30 @@ End Sub
 
 Private Sub PartInfoSub()
 
-    Dim UPC As Recordset
-    Set UPC = MstrDb.Execute("SELECT * FROM Barcodes WHERE SKU Is Null AND User Is Null ORDER BY UPC")
-    UPC.MoveFirst
-    
-    Me.external_product_id.Value = UPC.Fields("UPC").Value
-    
-    UPC.Close
-    
     If ListingMode = "Single" Then
+        
+        'disable Brand becuase it has to be AD Auto Parts and enable Product ID if single
         Me.brand_name.Value = ""
         Me.brand_name.Enabled = False
         Me.BrandLabel.Enabled = False
+        Me.external_product_id.Enabled = True
         
         Me.update_delete.Value = ""
-        Me.update_delete.Enabled = False
-        Me.UpdateDeleteLabel.Enabled = False
+        
+        'Access the Master Database and query the next available GTIN/UPC
+        Dim UPC As Recordset
+        Set UPC = MstrDb.Execute("SELECT * FROM GTINs WHERE SKU Is Null AND User Is Null AND DateReserved Is Null ORDER BY GTIN")
+        UPC.MoveFirst
+        
+        'fill in the next available GTIN as a UPC in external_product_id box
+        Me.external_product_id.Value = Right(UPC.Fields("GTIN").Value, 12)
+        
+        UPC.Close
+
     Else
         Me.brand_name.Enabled = True
         Me.BrandLabel.Enabled = True
+        Me.external_product_id.Enabled = False
     End If
 
 End Sub
@@ -726,6 +732,8 @@ Private Sub ListSingle(listingrow As Integer, lastcolumnletter As String, IsSet 
     'Product Id type
     Call EnterProductIDType(lastcolumnletter, listingrow)
     
+    Call EnterProductID(lastcolumnletter, listingrow)
+    
     'Feed product type
     Call EnterFeedProductType(lastcolumnletter, listingrow)
     
@@ -734,6 +742,9 @@ Private Sub ListSingle(listingrow As Integer, lastcolumnletter As String, IsSet 
 
     'Brand
     Call EnterBrand(lastcolumnletter, listingrow)
+    
+    'Manufacturer
+    Call EnterManufacturer(lastcolumnletter, listingrow)
     
     'Price
     Call EnterPrice(lastcolumnletter, listingrow, IsSet, SetArr, i)
@@ -780,17 +791,23 @@ Private Sub ListSingle(listingrow As Integer, lastcolumnletter As String, IsSet 
         Call EnterSizeName(lastcolumnletter, listingrow, SetArr, i)
         
         'overwrite part number
-        If AmazonColumn(lastcolumnletter, "part_number") > 0 Then Cells(listingrow, AmazonColumn(lastcolumnletter, "part_number")).Value = Me.part_number.Value & "-" & _
-            Replace(SetArr(i), "Setof", "")
+        If AmazonColumn(lastcolumnletter, "part_number") > 0 Then
+            If SetArr(i) = "Setof1" Then
+                Cells(listingrow, AmazonColumn(lastcolumnletter, "part_number")).Value = Me.part_number.Value
+            Else
+                Cells(listingrow, AmazonColumn(lastcolumnletter, "part_number")).Value = Me.part_number.Value & "-" & _
+                Replace(SetArr(i), "Setof", "")
+            End If
+        End If
         
         'parentage
         If AmazonColumn(lastcolumnletter, "parent_child") > 0 Then Cells(listingrow, AmazonColumn(lastcolumnletter, "parent_child")).Value = "child"
         
         'relationship type
-        If AmazonColumn(lastcolumnletter, "parent_child") > 0 Then Cells(listingrow, AmazonColumn(lastcolumnletter, "relationship_type")).Value = "Variation"
+        If AmazonColumn(lastcolumnletter, "relationship_type") > 0 Then Cells(listingrow, AmazonColumn(lastcolumnletter, "relationship_type")).Value = "Variation"
         
         'variation theme
-        If AmazonColumn(lastcolumnletter, "parent_child") > 0 Then Cells(listingrow, AmazonColumn(lastcolumnletter, "variation_theme")).Value = "sizeName"
+        If AmazonColumn(lastcolumnletter, "variation_theme") > 0 Then Cells(listingrow, AmazonColumn(lastcolumnletter, "variation_theme")).Value = "sizeName"
         
         'title
         
@@ -805,9 +822,6 @@ Private Sub ListSingle(listingrow As Integer, lastcolumnletter As String, IsSet 
         
         
         'item dimensions
-        
-        
-        'warranty
         
         
     End If
@@ -922,7 +936,9 @@ Private Sub EnterControls(lastcolumnletter As String, listingrow As Integer, Opt
             
             'some items on the userform are not in the Amazon Template, like the Reboxed checkbox
             'if field name is not found, FoundColumn will return 0, and can't have a 0th column
-            If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = cCont.Value
+            'add exception to external_product_id because it needs to be pulled from Master Database
+            'add exception to manufacturer because it usually needs to be overridden
+            If foundcolumn > 0 And cCont.Name <> "external_product_id" And cCont.Name <> "manufacturer" Then Cells(listingrow, foundcolumn).Value = cCont.Value
         End If
     Next cCont
 
@@ -934,7 +950,15 @@ Private Sub EnterSKU(lastcolumnletter As String, listingrow As Integer, IsSet As
     foundcolumn = AmazonColumn(lastcolumnletter, "item_sku")
     
     'add set size to end of sku
-    If IsSet = True Then Cells(listingrow, foundcolumn).Value = Me.item_sku.Value & "-" & Replace(SetArr(i), "Setof", "")
+    If IsSet = True Then
+        If SetArr(i) = "Setof1" Then
+            Cells(listingrow, foundcolumn).Value = Me.item_sku.Value
+        Else
+            Cells(listingrow, foundcolumn).Value = Me.item_sku.Value & "-" & Replace(SetArr(i), "Setof", "")
+        End If
+    Else
+        Cells(listingrow, foundcolumn).Value = Me.item_sku.Value
+    End If
 
 End Sub
 
@@ -946,6 +970,44 @@ Private Sub EnterProductIDType(lastcolumnletter As String, listingrow As Integer
     
     If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "UPC"
 
+End Sub
+
+Private Sub EnterProductID(lastcolumnletter As String, listingrow As Integer)
+
+    Dim foundcolumn As Integer
+    Dim setSKU
+    
+    'find column where product Id goes
+    foundcolumn = AmazonColumn(lastcolumnletter, "external_product_id")
+    
+    Dim GTIN As String
+    Dim ProductID As Recordset
+    
+    'get next availble UPC from GTINs table
+    Set ProductID = MstrDb.Execute("SELECT * FROM GTINs WHERE SKU Is Null AND User Is Null and DateReserved Is Null ORDER BY GTIN")
+    ProductID.MoveFirst
+    
+    'save GTIN to variable
+    GTIN = ProductID.Fields("GTIN").Value
+    ProductID.Close
+    
+    'remove the first towo digits from the GTIN to get UPC
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = Right(GTIN, 12)
+    
+    'find the column where SKU is located
+    foundcolumn = AmazonColumn(lastcolumnletter, "item_sku")
+    If foundcolumn > 0 Then setSKU = Cells(listingrow, foundcolumn).Value
+    
+    'find the user
+    Dim User As String
+    'grab user from ComputerUsersTable based on current computer being used
+    Set ProductID = MstrDb.Execute("SELECT UserName FROM ComputerUsersTable WHERE ComputerName = " & Chr(34) & Environ$("computername") & Chr(34))
+    User = ProductID.Fields("UserName")
+    ProductID.Close
+    
+    'update the GTINs table to reserve UPCs
+    Set rst = MstrDb.Execute("UPDATE [GTINs] Set GTINs.SKU = " & Chr(34) & setSKU & Chr(34) & ", GTINs.User = " & Chr(34) & User & Chr(34) & ", GTINs.DateReserved = Now WHERE GTINs.GTIN = " & Chr(34) & GTIN & Chr(34))
+    
 End Sub
 
 Private Sub EnterFeedProductType(lastcolumnletter As String, listingrow As Integer)
@@ -977,6 +1039,22 @@ Private Sub EnterItemType(lastcolumnletter As String, listingrow As Integer)
 End Sub
 
 Private Sub EnterBrand(lastcolumnletter As String, listingrow As Integer)
+
+    Dim foundcolumn As Integer
+    
+    'brand
+    If ListingMode = "Single" Then
+        foundcolumn = AmazonColumn(lastcolumnletter, "brand_name")
+        
+        If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "AD Auto Parts"
+    Else
+        'to be determined
+        
+    End If
+
+End Sub
+
+Private Sub EnterManufacturer(lastcolumnletter As String, listingrow As Integer)
 
     Dim foundcolumn As Integer
     
@@ -1027,73 +1105,79 @@ Private Sub EnterPackageQauntity(lastcolumnletter As String, listingrow As Integ
 End Sub
 
 Private Sub EnterShippingTemplate(lastcolumnletter As String, listingrow As Integer, IsSet As Boolean, Optional SetArr, Optional i As Integer)
-
+    
     Dim weight_oz As Double
     Dim shiptempcol As Integer
     
     'first find the column where the shipping template will be
     shiptempcol = AmazonColumn(lastcolumnletter, "merchant_shipping_group_name")
     
-    'if user entered "Weight-Based" for the shipping tmeplate, calculate and replace it with the correct template
-    If Cells(listingrow, shiptempcol).Value = "Weight-Based" Then
-        'convert weight to ounces and multiply by package qauntity to find total weight of listing
-        If Me.website_shipping_weight_unit_of_measure = "LB" Then
-            weight_oz = Me.website_shipping_weight.Value * 16 * Me.item_package_quantity.Value
-        Else
-            If IsSet = True Then
-                weight_oz = Me.website_shipping_weight.Value * Replace(SetArr(i), "Setof", "")
-            Else
-                weight_oz = Me.website_shipping_weight.Value * Me.item_package_quantity.Value
-            End If
-        End If
-        
-        'choose appropriate Amazon Shipping Template based on weight
-        Select Case weight_oz
-        Case Is <= 13   '13 ounces or less
-            '13 ounce template
-            Cells(listingrow, shiptempcol).Value = "13 oz. Template"
-
-        Case Is <= 128  'between 13 oz and 8 lb.
-            '1-8 lb. Template
-            'round weight up to the next pound
-            If weight_oz > 16 Then
-                weight_oz = weight_oz / 16
-            Else
-                weight_oz = 1  'if weight is over 13 ounces but less than a pound, calculate template based on 1 pound
-            End If
-            
-            'Concatenate the shipping template name
-            Cells(listingrow, shiptempcol).Value = RoundUp(weight_oz) & " lb. Template"
-        
-        Case Is <= 160  'between 8 lb. and 10 lb.
-            '9-10 lb. Template
-            Cells(listingrow, shiptempcol).Value = "9-10 lb. Template"
-        
-        Case Is <= 192  'between 10 and 12 lb.
-            '11-12 lb. Template
-            Cells(listingrow, shiptempcol).Value = "11-12 lb. Template"
-        
-        Case Is <= 224  'between 12 and 14 lb.
-            '13-14 lb. Template
-            Cells(listingrow, shiptempcol).Value = "13-14 lb. Template"
-        
-        Case Is <= 288  'between 14 and 18 lb.
-            '15-18 lb. Template
-            Cells(listingrow, shiptempcol).Value = "15-18 lb. Template"
-        
-        Case Is <= 304  'between 18 and 19 lb.
-            '19 lb. Template
-            Cells(listingrow, shiptempcol).Value = "19 lb. Template"
-            
-        Case Else   'over 19 pounds
-            '20-45 lb. Template
-            Cells(listingrow, shiptempcol).Value = "20-45 lb. Template"
-        End Select
-    Else
-        'If user entered Prime for shipping template, replace with Prime shipping template
-        Cells(listingrow, shiptempcol).Value = Me.merchant_shipping_group_name
-    End If
+    'Enter the shipping template the user chose
+    Cells(listingrow, shiptempcol).Value = Me.merchant_shipping_group_name.Value
     
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'Code not needed anymore because it's impossible to predict what shipping template needs to be used
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'    'if user entered "Weight-Based" for the shipping tmeplate, calculate and replace it with the correct template
+'    If Cells(listingrow, shiptempcol).Value = "Weight-Based" Then
+'        'convert weight to ounces and multiply by package qauntity to find total weight of listing
+'        If Me.website_shipping_weight_unit_of_measure = "LB" Then
+'            weight_oz = Me.website_shipping_weight.Value * 16 * Me.item_package_quantity.Value
+'        Else
+'            If IsSet = True Then
+'                weight_oz = Me.website_shipping_weight.Value * Replace(SetArr(i), "Setof", "")
+'            Else
+'                weight_oz = Me.website_shipping_weight.Value * Me.item_package_quantity.Value
+'            End If
+'        End If
+'
+'        'choose appropriate Amazon Shipping Template based on weight
+'        Select Case weight_oz
+'        Case Is <= 13   '13 ounces or less
+'            '13 ounce template
+'            Cells(listingrow, shiptempcol).Value = "13 oz. Template"
+'
+'        Case Is <= 128  'between 13 oz and 8 lb.
+'            '1-8 lb. Template
+'            'round weight up to the next pound
+'            If weight_oz > 16 Then
+'                weight_oz = weight_oz / 16
+'            Else
+'                weight_oz = 1  'if weight is over 13 ounces but less than a pound, calculate template based on 1 pound
+'            End If
+'
+'            'Concatenate the shipping template name
+'            Cells(listingrow, shiptempcol).Value = RoundUp(weight_oz) & " lb. Template"
+'
+'        Case Is <= 160  'between 8 lb. and 10 lb.
+'            '9-10 lb. Template
+'            Cells(listingrow, shiptempcol).Value = "9-10 lb. Template"
+'
+'        Case Is <= 192  'between 10 and 12 lb.
+'            '11-12 lb. Template
+'            Cells(listingrow, shiptempcol).Value = "11-12 lb. Template"
+'
+'        Case Is <= 224  'between 12 and 14 lb.
+'            '13-14 lb. Template
+'            Cells(listingrow, shiptempcol).Value = "13-14 lb. Template"
+'
+'        Case Is <= 288  'between 14 and 18 lb.
+'            '15-18 lb. Template
+'            Cells(listingrow, shiptempcol).Value = "15-18 lb. Template"
+'
+'        Case Is <= 304  'between 18 and 19 lb.
+'            '19 lb. Template
+'            Cells(listingrow, shiptempcol).Value = "19 lb. Template"
+'
+'        Case Else   'over 19 pounds
+'            '20-45 lb. Template
+'            Cells(listingrow, shiptempcol).Value = "20-45 lb. Template"
+'        End Select
+'    Else
+'        'If user entered Prime for shipping template, replace with Prime shipping template
+'        Cells(listingrow, shiptempcol).Value = Me.merchant_shipping_group_name
+'    End If
+
 End Sub
 
 Private Sub EnterDiscontinued(lastcolumnletter As String, listingrow As Integer)
@@ -1242,13 +1326,15 @@ End Sub
 
 Private Sub EnterWarranty(lastcolumnletter As String, listingrow As Integer)
 
-    Dim rFindwar As Range
-    Dim rFindwarTyp As Range
     Dim foundcolumn As Integer
     
+    'enter the warranty type
     foundcolumn = AmazonColumn(lastcolumnletter, "mfg_warranty_description_type")
-        
     If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "Parts"
+    
+    'enter the warranty description
+    foundcolumn = AmazonColumn(lastcolumnletter, "warranty_description")
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "Manufacturer warranty for 180 days from date of purchase, covers exchange of defective part while supplies last or a prorated return of defective part."
 
 End Sub
 

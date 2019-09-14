@@ -59,20 +59,20 @@ Public Sub ConnectSixbitDatabase()
 
     'open connection to Sixbit database
     'open username info
-    Dim user As String
+    Dim User As String
     Dim pw As String
     Set rst = MstrDb.Execute("SELECT * FROM Sixbit_DB_Fields")
     rst.MoveLast
     
-    user = rst.Fields("Sixbit_UserID").Value
+    User = rst.Fields("Sixbit_UserID").Value
     pw = rst.Fields("Sixbit_PW").Value
     
-    SxbtDb.Open "Provider=SQLOLEDB;Server=ADP-SERVER\SIXBITDBSERVER;Database=Sixbit;User Id=" & user & ";Password=" & pw & ";"
+    SxbtDb.Open "Provider=SQLOLEDB;Server=ADP-SERVER\SIXBITDBSERVER;Database=Sixbit;User Id=" & User & ";Password=" & pw & ";"
     SxbtDb.CursorLocation = adUseClient
     
     'close out connection
     rst.Close
-    user = ""
+    User = ""
     pw = ""
 
     Exit Sub
