@@ -324,13 +324,13 @@ Private Sub PartInfoSub()
         Me.external_product_id.Value = Right(UPC.Fields("GTIN").Value, 12)
         
         UPC.Close
-
+        
     Else
         Me.brand_name.Enabled = True
         Me.BrandLabel.Enabled = True
         Me.external_product_id.Enabled = False
     End If
-
+    
 End Sub
 
 Private Sub ReviewPageSub()
@@ -344,7 +344,7 @@ Private Sub ReviewPageSub()
         GenDesc
         
         'Generate Title
-        GenTitle
+        Me.item_name = GenTitle(Me.item_package_quantity.Value, Me.Manufacturer.Value, Me.part_number.Value, Me.part_type_id.Value, "", Me.oem_equivalent_part_number1.Value, "", Me.ParentageCheckBox.Value)
     End If
 
 End Sub
@@ -376,18 +376,49 @@ Private Sub GenDesc()
 
     Select Case Me.ParentageCheckBox
         Case False
-            
+            Me.product_description.Value = "This item is designed to be an exact replacement that meets or exceeds original specifications. Please ensure correct part fitment before purchasing this product. Contact the seller directly for additional product information and availability."
         Case True
-            
+            Me.product_description.Value = "This item is designed to be an exact replacement that meets or exceeds original specifications. Please ensure correct part fitment before purchasing this product. Contact the seller directly for additional product information and availability."
     End Select
 
 End Sub
 
-Private Sub GenTitle()
+Private Function GenTitle(quantity As String, Manufacturer As String, partNum As String, partType As String, fits As String, equivPart As String, equivBrand As String, isSet As Boolean, Optional SetArr, Optional listingrow As Integer) As String
 
-    Me.item_name.Value = Me.item_package_quantity.Value & " " & Me.Manufacturer.Value & " " & Me.part_number.Value & " " & Me.part_type_id.Value
+    Dim name As String
+    
+    'Single Listing
+    If Me.ParentageCheckBox = False Then
+        'non single title
+        If quantity > 1 Then
+            name = Manufacturer & " " & partType & " For _ Compatible with _ " & Me.oem_equivalent_part_number1.Value
+        Else
+            'sets
+            If quantity > 1 Then
+                name = "Set of " & quantity & " " & partType & "s For _ Compatible with _ " & Me.oem_equivalent_part_number1.Value
+            Else
+                'single
+                name = partType & " For _ Compatible with _ " & Me.oem_equivalent_part_number1.Value
+            End If
+        End If
+    Else
+        'parent title
+        If IsMissing(SetArr) = False Then quantity = Replace(SetArr(listingrow), "Setof", "")
+        
+        If quantity <> "" Then
+            'sets
+            If quantity > 1 Then
+                name = "Set of " & quantity & " " & partType & "s For _ Compatible with _ " & Me.oem_equivalent_part_number1.Value
+            Else
+                'single
+                name = partType & " For _ Compatible with _ " & Me.oem_equivalent_part_number1.Value
+            End If
+        End If
+    End If
+    
+    GenTitle = name
 
-End Sub
+End Function
 
 Private Sub comboBoxes()
 
@@ -684,7 +715,7 @@ Private Sub CheckEmptyRequiredFields()
         If Not TypeName(cCont) = "Label" And Not TypeName(cCont) = "MultiPage" And Not TypeName(cCont) = "CommandButton" And Not TypeName(cCont) = "CheckBox" And Not TypeName(cCont) = "Nothing" Then
             rst.MoveFirst
             Do While Not rst.EOF
-                If LCase(cCont.Name) = LCase(rst.Fields("Field_Name").Value) Then
+                If LCase(cCont.name) = LCase(rst.Fields("Field_Name").Value) Then
                     If cCont.Enabled = True Then
                         If cCont = "" Then
                             For Each savedCont In Me.MultiPage1.Pages(currentPage).Controls
@@ -721,13 +752,13 @@ End Sub
 'listingRow is the row that will be populated in the sheet for that listing
 'IsSet is used to list a single part number, if false, only a single listing is being listed, if true then multiple sets of that part number are being listed
 'setArr and i are only needed for listing multiple sets of a single part number
-Private Sub ListSingle(listingrow As Integer, lastcolumnletter As String, IsSet As Boolean, Optional SetArr, Optional i As Integer)
+Private Sub ListSingle(listingrow As Integer, lastcolumnletter As String, isSet As Boolean, Optional SetArr, Optional i As Integer)
     
     'Match the control name in the Form to the field name in the sheet and put the user-entered value into the correct cell
     Call EnterControls(lastcolumnletter, listingrow)
     
     'sku
-    Call EnterSKU(lastcolumnletter, listingrow, IsSet, SetArr, i)
+    Call EnterSKU(lastcolumnletter, listingrow, isSet, SetArr, i)
     
     'Product Id type
     Call EnterProductIDType(lastcolumnletter, listingrow)
@@ -747,19 +778,19 @@ Private Sub ListSingle(listingrow As Integer, lastcolumnletter As String, IsSet 
     Call EnterManufacturer(lastcolumnletter, listingrow)
     
     'Price
-    Call EnterPrice(lastcolumnletter, listingrow, IsSet, SetArr, i)
+    Call EnterPrice(lastcolumnletter, listingrow, isSet, SetArr, i)
     
     'Package Quantity
     Call EnterPackageQauntity(lastcolumnletter, listingrow)
     
     'Shipping Template
-    Call EnterShippingTemplate(lastcolumnletter, listingrow, IsSet, SetArr, i)
+    Call EnterShippingTemplate(lastcolumnletter, listingrow, isSet, SetArr, i)
     
     'Is dicontinued by manufacturer
     Call EnterDiscontinued(lastcolumnletter, listingrow)
     
     'number of items
-    Call EnterNumberofItems(lastcolumnletter, listingrow, IsSet, SetArr, i)
+    Call EnterNumberofItems(lastcolumnletter, listingrow, isSet, SetArr, i)
 
     'quantity
     Call EnterQuantity(lastcolumnletter, listingrow)
@@ -780,7 +811,7 @@ Private Sub ListSingle(listingrow As Integer, lastcolumnletter As String, IsSet 
     Call EnterWarranty(lastcolumnletter, listingrow)
     
     'Overwrite fields (populated by EnterControls sub) that change for sets
-    If IsSet = True Then
+    If isSet = True Then
         'Weight
         Call EnterWeight(lastcolumnletter, listingrow, SetArr, i)
         
@@ -810,7 +841,7 @@ Private Sub ListSingle(listingrow As Integer, lastcolumnletter As String, IsSet 
         If AmazonColumn(lastcolumnletter, "variation_theme") > 0 Then Cells(listingrow, AmazonColumn(lastcolumnletter, "variation_theme")).Value = "sizeName"
         
         'title
-        
+        Call EnterTitle(lastcolumnletter, listingrow, SetArr, i)
         
         'description
         
@@ -914,7 +945,7 @@ Private Sub SetsArray(SetArr)
             If cCont = True Then
                 'add every checked box in Parentage page to array
                 If UBound(SetArr) > 0 Or SetArr(0) <> "" Then ReDim Preserve SetArr(UBound(SetArr) + 1)
-                SetArr(UBound(SetArr)) = cCont.Name
+                SetArr(UBound(SetArr)) = cCont.name
             End If
         End If
     Next
@@ -932,25 +963,25 @@ Private Sub EnterControls(lastcolumnletter As String, listingrow As Integer, Opt
         If Not TypeName(cCont) = "Label" And Not TypeName(cCont) = "MultiPage" And Not TypeName(cCont) = "CommandButton" And Not TypeName(cCont) = "Nothing" Then
             'Find the column number of the Control
             
-            foundcolumn = AmazonColumn(lastcolumnletter, cCont.Name)
+            foundcolumn = AmazonColumn(lastcolumnletter, cCont.name)
             
             'some items on the userform are not in the Amazon Template, like the Reboxed checkbox
             'if field name is not found, FoundColumn will return 0, and can't have a 0th column
             'add exception to external_product_id because it needs to be pulled from Master Database
             'add exception to manufacturer because it usually needs to be overridden
-            If foundcolumn > 0 And cCont.Name <> "external_product_id" And cCont.Name <> "manufacturer" Then Cells(listingrow, foundcolumn).Value = cCont.Value
+            If foundcolumn > 0 And cCont.name <> "external_product_id" And cCont.name <> "manufacturer" Then Cells(listingrow, foundcolumn).Value = cCont.Value
         End If
     Next cCont
 
 End Sub
 
-Private Sub EnterSKU(lastcolumnletter As String, listingrow As Integer, IsSet As Boolean, SetArr, i As Integer)
+Private Sub EnterSKU(lastcolumnletter As String, listingrow As Integer, isSet As Boolean, SetArr, i As Integer)
 
     Dim foundcolumn As Integer
     foundcolumn = AmazonColumn(lastcolumnletter, "item_sku")
     
     'add set size to end of sku
-    If IsSet = True Then
+    If isSet = True Then
         If SetArr(i) = "Setof1" Then
             Cells(listingrow, foundcolumn).Value = Me.item_sku.Value
         Else
@@ -1006,7 +1037,7 @@ Private Sub EnterProductID(lastcolumnletter As String, listingrow As Integer)
     ProductID.Close
     
     'update the GTINs table to reserve UPCs
-    Set rst = MstrDb.Execute("UPDATE [GTINs] Set GTINs.SKU = " & Chr(34) & setSKU & Chr(34) & ", GTINs.User = " & Chr(34) & User & Chr(34) & ", GTINs.DateReserved = Now WHERE GTINs.GTIN = " & Chr(34) & GTIN & Chr(34))
+'    Set rst = MstrDb.Execute("UPDATE [GTINs] Set GTINs.SKU = " & Chr(34) & setSKU & Chr(34) & ", GTINs.User = " & Chr(34) & User & Chr(34) & ", GTINs.DateReserved = Now WHERE GTINs.GTIN = " & Chr(34) & GTIN & Chr(34))
     
 End Sub
 
@@ -1035,6 +1066,22 @@ Private Sub EnterItemType(lastcolumnletter As String, listingrow As Integer)
     
     'close the query
     rst.Close
+
+End Sub
+
+Private Sub EnterTitle(lastcolumnletter As String, listingrow As Integer, SetArr, i As Integer)
+
+    Dim foundcolumn As Integer
+    
+    foundcolumn = AmazonColumn(lastcolumnletter, "item_name")
+    
+    If foundcolumn > 0 Then
+        If Me.ParentageCheckBox.Value = True Then
+            Cells(listingrow, foundcolumn).Value = GenTitle(Me.item_package_quantity.Value, Me.Manufacturer.Value, Me.part_number.Value, Me.part_type_id.Value, "", Me.oem_equivalent_part_number1.Value, "", Me.ParentageCheckBox.Value, SetArr, i)
+        Else
+            Cells(listingrow, foundcolumn).Value = GenTitle(Me.item_package_quantity.Value, Me.Manufacturer.Value, Me.part_number.Value, Me.part_type_id.Value, "", Me.oem_equivalent_part_number1.Value, "", Me.ParentageCheckBox.Value)
+        End If
+    End If
 
 End Sub
 
@@ -1070,12 +1117,12 @@ Private Sub EnterManufacturer(lastcolumnletter As String, listingrow As Integer)
 
 End Sub
 
-Private Sub EnterPrice(lastcolumnletter As String, listingrow As Integer, IsSet As Boolean, SetArr, i As Integer)
+Private Sub EnterPrice(lastcolumnletter As String, listingrow As Integer, isSet As Boolean, SetArr, i As Integer)
 
     Dim foundcolumn As Integer
     foundcolumn = AmazonColumn(lastcolumnletter, "standard_price")
     
-    If IsSet = True Then
+    If isSet = True Then
         Cells(listingrow, foundcolumn).Value = Replace(SetArr(i), "Setof", "") * Me.standard_price.Value
     Else
         Cells(listingrow, foundcolumn).Value = Me.standard_price.Value
@@ -1104,7 +1151,7 @@ Private Sub EnterPackageQauntity(lastcolumnletter As String, listingrow As Integ
 
 End Sub
 
-Private Sub EnterShippingTemplate(lastcolumnletter As String, listingrow As Integer, IsSet As Boolean, Optional SetArr, Optional i As Integer)
+Private Sub EnterShippingTemplate(lastcolumnletter As String, listingrow As Integer, isSet As Boolean, Optional SetArr, Optional i As Integer)
     
     Dim weight_oz As Double
     Dim shiptempcol As Integer

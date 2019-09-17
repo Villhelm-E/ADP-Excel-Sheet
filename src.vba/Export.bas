@@ -8,7 +8,7 @@ Public Sub XLSX()
     Dim currentsheetname As Variant
     
     'save current sheet's name to variable
-    currentsheetname = Application.ActiveSheet.Name
+    currentsheetname = Application.ActiveSheet.name
 
     'activate current sheet and copy it
     Set sh = Sheets(currentsheetname)
@@ -44,7 +44,7 @@ Public Sub CSV()
     Dim currentsheetname As Variant
     
     'save current sheet's name to variable
-    currentsheetname = Application.ActiveSheet.Name
+    currentsheetname = Application.ActiveSheet.name
 
     'activate current sheet and copy it
     Set sh = Sheets(currentsheetname)
@@ -80,7 +80,7 @@ Public Sub TXT()
     Dim currentsheetname As Variant
     
     'save current sheet's name to variable
-    currentsheetname = Application.ActiveSheet.Name
+    currentsheetname = Application.ActiveSheet.name
 
     'activate current sheet and copy it
     Set sh = Sheets(currentsheetname)
@@ -122,7 +122,7 @@ Public Sub EmailMain()
     If ActiveWindow.SelectedSheets.Count > 1 Then
         LFileName = "Workbook Attachment"
     Else
-        LFileName = ActiveSheet.Name
+        LFileName = ActiveSheet.name
     End If
     
     'validate attachment name

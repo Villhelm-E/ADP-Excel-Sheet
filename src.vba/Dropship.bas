@@ -181,15 +181,15 @@ Private Sub RenameSheet(Source As String, numrows As Integer)
     yearEnd = Left(Range("A" & numrows), Len(Range("A" & numrows)) - 4) & Right(Range("A" & numrows), 2)
     
     If yearStart = yearEnd Then
-        ActiveSheet.Name = Replace(Source & " " & yearStart, "/", "-")
+        ActiveSheet.name = Replace(Source & " " & yearStart, "/", "-")
     Else
-        ActiveSheet.Name = Replace(Source & " " & yearStart & "" & yearEnd, "/", "-")
+        ActiveSheet.name = Replace(Source & " " & yearStart & "" & yearEnd, "/", "-")
     End If
     
     Exit Sub
     
 dateError:
-    ActiveSheet.Name = "Herko"
+    ActiveSheet.name = "Herko"
     
 End Sub
 
@@ -201,7 +201,7 @@ Public Sub FindShipstationReport()
     FoundSheet = False
     
     For Each wsSheet In Worksheets
-        If wsSheet.Name Like "Shipstation**" Then
+        If wsSheet.name Like "Shipstation**" Then
             FoundSheet = True
             GoTo Exit_Loop
         End If
@@ -221,7 +221,7 @@ Public Sub ImportShipstationReport(ChosenSheet As Worksheet)
     On Error Resume Next
     
     Dim HerkoReportName As String
-    HerkoReportName = ChosenSheet.Name
+    HerkoReportName = ChosenSheet.name
     
     Dim ShipstationNumRows As Integer
     ShipstationNumRows = CountRows("A:A")

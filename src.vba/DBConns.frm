@@ -67,7 +67,7 @@ Private Sub FormatStatus()
     For Each i In Me.Controls
         If TypeName(i) = "Label" Then
             'Isolate Labels that end in Conn to format
-            If Right(i.Name, 4) = "Conn" Then
+            If Right(i.name, 4) = "Conn" Then
                 'if label caption is "Active", color green
                 If i.Caption = "Active" Then
                     i.ForeColor = RGB(0, 192, 0)

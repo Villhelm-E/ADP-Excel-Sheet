@@ -113,7 +113,7 @@ Private Sub CopySheets(currentbook As Workbook, destBook As Workbook)
         'loop through worksheets in new workbook
         For i = 1 To Worksheets.Count
             'if the worksheet already exists, set exists to true and end the loop
-            If currentbook.Sheets(i).Name = currentsheet.Name Then
+            If currentbook.Sheets(i).name = currentsheet.name Then
                 exists = True
                 GoTo exit_i_loop 'ends loop
             Else
@@ -130,7 +130,7 @@ exit_i_loop:
             sheetIndex = sheetIndex + 1 'increment sheet index in new sheet
         Else
         '''''if sheet exists, replace the sheet in new workbook with sheet from current workbook
-            oldName = currentsheet.Name
+            oldName = currentsheet.name
             
             'copy the sheet
             If oldName = "Amazon Template" Then
@@ -141,7 +141,7 @@ exit_i_loop:
             
             'delete the existing sheet
             Application.DisplayAlerts = False
-            destBook.Sheets(currentsheet.Name).Delete
+            destBook.Sheets(currentsheet.name).Delete
             Application.DisplayAlerts = True
             
             'rename the sheet, copying adds " (2)" to the end
@@ -149,7 +149,7 @@ exit_i_loop:
                 i = 2
             End If
             
-            destBook.Sheets(i).Name = oldName
+            destBook.Sheets(i).name = oldName
         End If
         
 Amazon_Template:

@@ -17,11 +17,11 @@ Public Sub PrepWorksheet(SheetName As String)
         'Otherwise create the worksheet
         If CheckBlank = True Then
             'if current worksheet is blank, just rename the worksheet to sheetName
-            ActiveSheet.Name = SheetName
+            ActiveSheet.name = SheetName
         Else
             'if current worksheet is not blank, add worksheet to the end and name it
             With Sheets.Add(, Sheets(Sheets.Count))
-                .Name = SheetName
+                .name = SheetName
             End With
         End If
     End If
@@ -46,12 +46,12 @@ Public Sub RenameSheet()
     
     'begin the loop
     For i = 1 To WS_Count
-        If ActiveWorkbook.Worksheets(i).Name = PartName & " " & FitmentSource Then
+        If ActiveWorkbook.Worksheets(i).name = PartName & " " & FitmentSource Then
             'count the number of existing sheets with the same name
             FoundSheet = FoundSheet + 1
         End If
         
-        If ActiveWorkbook.Worksheets(i).Name = PartName & " " & FitmentSource & " (Copy)" Then
+        If ActiveWorkbook.Worksheets(i).name = PartName & " " & FitmentSource & " (Copy)" Then
             'count the number of existing copies ot existing sheets witht he same name
             FoundCopy = FoundCopy + 1
         End If
@@ -63,20 +63,20 @@ Public Sub RenameSheet()
         Case 0
             'if there are copies, append a number at the end
             If FoundCopy > 0 Then
-                ws.Name = PartName & " " & FitmentSource & " (Copy) " & FoundCopy
+                ws.name = PartName & " " & FitmentSource & " (Copy) " & FoundCopy
             Else
                 'name the worksheet
-                ws.Name = PartName & " " & FitmentSource
+                ws.name = PartName & " " & FitmentSource
             End If
         
         'if there are copies
         Case Else
             'if there are copies, append a number at the end
             If FoundCopy > 0 Then
-                ws.Name = PartName & " " & FitmentSource & " (Copy) " & FoundCopy
+                ws.name = PartName & " " & FitmentSource & " (Copy) " & FoundCopy
             Else
                 'add (Copy) to the copy
-                ws.Name = PartName & " " & FitmentSource & " (Copy)"
+                ws.name = PartName & " " & FitmentSource & " (Copy)"
             End If
     End Select
 End Sub
