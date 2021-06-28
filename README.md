@@ -1,5 +1,5 @@
 # ADPExcelSheet
-VBA code used to automate AD Auto Parts processes
+This Excel workbook was designed for automating many repetitive processes when I worked at this job. I taught myself Excel, Access, VBA, and SQL in order to automate my menial tasks. This project represents the beginning of my programming career.
 # Features
 The ADP Excel Sheet can tackle many frequently repeated actions such as formatting fitments, dropship reports, and bill of materials. It can also generate templates for use in uploading to Amazon, Ebay, Finale, Shipstation, GS1, or MyFitment. It features useful exporting functions to save the current worksheet without Macros or as a CSV or TXT file as well as simple email functions.
 Buttons are context-aware and will deactivate when their function is not applicable in the current worksheet.
