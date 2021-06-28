@@ -47,6 +47,6 @@ This button generates a template for creating volume pricing in Ebay (a feature 
 ### File Formats
 Clicking on the export buttons will save the *CURRENT WORKSHEET* as XLSX, CSV or TXT format.
 ### Email
-This split button has the option to Emil the current worksheet as an attachment or the option to attach multiple worksheets from the workbook.
+This split button has the option to Email the current worksheet as an attachment or the option to attach multiple worksheets from the workbook.
 ## About
 These buttons provide database connection information and version information.
