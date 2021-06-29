@@ -24,7 +24,7 @@ Public Sub FixFitments()
             
 Exit_Format:
         Case Else
-            MsgBox "No fitments found."
+            MsgBox ("No fitments found.")
     End Select
     
     Formatted = True
@@ -69,4 +69,3 @@ Private Sub FormatAmazon()
     End If
 
 End Sub
-

@@ -12,9 +12,7 @@ Private Sub UserForm_Initialize()
     RefreshReconnectButton
     
     'position the userform
-    Me.StartUpPosition = 0
-    Me.Left = Application.Left + (0.5 * Application.Width) - (0.5 * Me.Width)
-    Me.Top = Application.Top + (0.5 * Application.Height) - (0.5 * Me.Height)
+    Call CenterForm(DBConns)
 
 End Sub
 
@@ -122,3 +120,4 @@ Private Sub CloseBtn_Click()
     Unload DBConns
 
 End Sub
+

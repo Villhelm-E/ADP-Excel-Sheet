@@ -26,7 +26,7 @@ End Sub
 Private Sub RefreshRibbon(Tag As String)
     MyTag = Tag
     If Rib Is Nothing Then
-        MsgBox "Error, Save and Reopen the workbook"
+        MsgBox ("Error, Save and Reopen the workbook")
     Else
         Rib.Invalidate  'refreshes the ribbon
     End If
@@ -47,9 +47,14 @@ Public Sub RibbonCategories()
     ElseIf RawFitments = True Then
         'check if fitments
         Tag = "*b*"                                     'enable format fitments button
-    ElseIf CheckBoM = True Then
-        'check if Bill of Materials report
-        Tag = "*k*"                                     'enable Format BoM button
+    ElseIf CheckBoM <> "" Then
+        If CheckBoM = "Compact" Then
+            'check if Bill of Materials Compact report
+            Tag = "*p*"
+        Else
+            'check if Bill of Materials report
+            Tag = "*k*"                                     'enable Format BoM button
+        End If
     ElseIf CheckOOS = True Then
         'check if out of stock sheet
         Tag = "*c*"                                     'enable OOS button
@@ -74,6 +79,9 @@ Public Sub RibbonCategories()
     ElseIf CheckVolumePricing = True Then
         'check if volume pricing template
         Tag = "*o*"
+    ElseIf CheckShippingMethods = True Then
+        Tag = "*e*"
+        ShippingValidation  'Finale Module
     Else
         'if not empty and not any of the above formats
         'this has to be the last check in this module

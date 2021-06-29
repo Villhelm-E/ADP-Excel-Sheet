@@ -19,22 +19,26 @@ Public Function RawFitments() As Boolean
     
     'looks for field values that indicate whether fitments came from Sixbit or Metro
     'will probably add other sources in the future
-    If Range("A1").Value = "" And Range("B1") = "" And Range("C1") = "" And IsNull(Range("D1")) = False And Range("E1").Value = "" And Range("F1").Value = "" Then
+    If range("A1").value = "" And range("B1") = "" And range("C1") = "" And IsNull(range("D1")) = False And range("E1").value = "" And range("F1").value = "" Then
         'cells as above indicate fitments came from Metro
         If Formatted = False Then FitmentSource = "Metro"
     Else
-        If Range("A1").Value = "Notes" And IsNull(Range("A2")) = False And _
-            Range("B1").Value = "Make" And IsNull(Range("B2")) = False And _
-            Range("C1").Value = "Model" And IsNull(Range("C2")) = False And _
-            Range("D1").Value = "Year" And IsNull(Range("D2")) = False And _
-            Range("E1").Value = "Trim" And IsNull(Range("E2")) = False And _
-            Range("F1").Value = "Engine" And IsNull(Range("F2")) = False Then
+        If (range("A1").value = "Notes" And IsNull(range("A2")) = False And _
+            range("B1").value = "Make" And IsNull(range("B2")) = False And _
+            range("C1").value = "Model" And IsNull(range("C2")) = False And _
+            range("D1").value = "Year" And IsNull(range("D2")) = False And _
+            range("E1").value = "Trim" And IsNull(range("E2")) = False And _
+            range("F1").value = "Engine" And IsNull(range("F2")) = False) Or _
+            (range("A1").value = "Engine" And range("B1").value = "Make" And _
+            range("C1").value = "Model" And range("G1").value = "Part Type" And _
+            range("H1").value = "Quantity Required" And range("I1").value = "Position" And _
+            range("J1").value = "MFRLabel") Then
             
             'cells as above indicate fitments came from Sixbit
             If Formatted = False Then FitmentSource = "Sixbit"
         Else
             'if cells don't match either configuration above, then the sheet doesn't contain fitments
-            If Range("A1").Value = "Make" And Range("B1").Value = "Model" And Range("C1").Value = "Year" And Range("D1").Value = "Trim" And Range("E1").Value = "Engine" And Range("F1").Value = "Notes" Then
+            If range("A1").value = "Make" And range("B1").value = "Model" And range("C1").value = "Year" And range("D1").value = "Trim" And range("E1").value = "Engine" And range("F1").value = "Notes" Then
                 If Formatted = False Then FitmentSource = "Amazon"
             Else
                 If Formatted = False Then FitmentSource = ""
@@ -49,19 +53,19 @@ End Function
 Public Function CheckACES() As Boolean
 
     'check if all the field headers indicate ACES fields
-    If Range("A1").Value = "part" And Range("B1").Value = "brand_code" And Range("C1").Value = "make" And Range("D1").Value = "model" And _
-    Range("E1").Value = "year" And Range("F1").Value = "partterminologyname" And Range("G1").Value = "notes" And Range("H1").Value = "qty" And _
-    Range("I1").Value = "mfrlabel" And Range("J1").Value = "position" And Range("K1").Value = "aspiration" And Range("L1").Value = "bedlength" And _
-    Range("M1").Value = "bedtype" And Range("N1").Value = "block" And Range("O1").Value = "bodynumdoors" And Range("P1").Value = "bodytype" And _
-    Range("Q1").Value = "brakeabs" And Range("R1").Value = "brakesystem" And Range("S1").Value = "cc" And Range("T1").Value = "cid" And _
-    Range("U1").Value = "cylinderheadtype" And Range("V1").Value = "cylinders" And Range("W1").Value = "drivetype" And Range("X1").Value = "enginedesignation" And _
-    Range("Y1").Value = "enginemfr" And Range("Z1").Value = "engineversion" And Range("AA1").Value = "enginevin" And Range("AB1").Value = "frontbraketype" And _
-    Range("AC1").Value = "frontspringtype" And Range("AD1").Value = "fueldeliverysubtype" And Range("AE1").Value = "fueldeliverytype" And Range("AF1").Value = "fuelsystemcontroltype" And _
-    Range("AG1").Value = "fuelsystemdesign" And Range("AH1").Value = "fueltype" And Range("AI1").Value = "ignitionsystemtype" And Range("AJ1").Value = "liters" And _
-    Range("AK1").Value = "mfrbodycode" And Range("AL1").Value = "rearbraketype" And Range("AM1").Value = "rearspringtype" And Range("AN1").Value = "region" And _
-    Range("AO1").Value = "steeringsystem" And Range("AP1").Value = "steeringtype" And Range("AQ1").Value = "submodel" And Range("AR1").Value = "transmissioncontroltype" And _
-    Range("AS1").Value = "transmissionmfr" And Range("AT1").Value = "transmissionmfrcode" And Range("AU1").Value = "transmissionnumspeeds" And Range("AV1").Value = "transmissiontype" And _
-    Range("AW1").Value = "valvesperengine" And Range("AX1").Value = "wheelbase" Then
+    If range("A1").value = "part" And range("B1").value = "brand_code" And range("C1").value = "make" And range("D1").value = "model" And _
+    range("E1").value = "year" And range("F1").value = "partterminologyname" And range("G1").value = "notes" And range("H1").value = "qty" And _
+    range("I1").value = "mfrlabel" And range("J1").value = "position" And range("K1").value = "aspiration" And range("L1").value = "bedlength" And _
+    range("M1").value = "bedtype" And range("N1").value = "block" And range("O1").value = "bodynumdoors" And range("P1").value = "bodytype" And _
+    range("Q1").value = "brakeabs" And range("R1").value = "brakesystem" And range("S1").value = "cc" And range("T1").value = "cid" And _
+    range("U1").value = "cylinderheadtype" And range("V1").value = "cylinders" And range("W1").value = "drivetype" And range("X1").value = "enginedesignation" And _
+    range("Y1").value = "enginemfr" And range("Z1").value = "engineversion" And range("AA1").value = "enginevin" And range("AB1").value = "frontbraketype" And _
+    range("AC1").value = "frontspringtype" And range("AD1").value = "fueldeliverysubtype" And range("AE1").value = "fueldeliverytype" And range("AF1").value = "fuelsystemcontroltype" And _
+    range("AG1").value = "fuelsystemdesign" And range("AH1").value = "fueltype" And range("AI1").value = "ignitionsystemtype" And range("AJ1").value = "liters" And _
+    range("AK1").value = "mfrbodycode" And range("AL1").value = "rearbraketype" And range("AM1").value = "rearspringtype" And range("AN1").value = "region" And _
+    range("AO1").value = "steeringsystem" And range("AP1").value = "steeringtype" And range("AQ1").value = "submodel" And range("AR1").value = "transmissioncontroltype" And _
+    range("AS1").value = "transmissionmfr" And range("AT1").value = "transmissionmfrcode" And range("AU1").value = "transmissionnumspeeds" And range("AV1").value = "transmissiontype" And _
+    range("AW1").value = "valvesperengine" And range("AX1").value = "wheelbase" Then
         
         CheckACES = True
     Else
@@ -72,7 +76,7 @@ End Function
 
 Public Function CheckOOS() As Boolean
 
-    If Range("A1").Value = "Select this item for performing bulk action" And (Range("B1").Value Like "Respond to questions*" Or Range("B1").Value Like "Edit*") Then
+    If range("A1").value Like "Select this item for performing bulk action*" And (range("B1").value Like "EditLink. Edit.*" Or range("B1").value Like "Respond to questions*") Then
         CheckOOS = True
     Else
         CheckOOS = False
@@ -81,8 +85,8 @@ End Function
 
 Public Function CheckWeekInv() As Boolean
 
-    If Range("A1").Text = "Product ID" And Range("B1").Text = "Description" And Range("C1").Text = "Location" And Range("D1").Text = "QoH" And Range("E1").Text = "Reorder Point" _
-    And Range("F1").Text = "Quantity Sold" And Not Range("A2").Text = "" And Range("A3").Text = "" And Range("D2").Text = "" And Range("E2").Text = "" And Range("F2").Text = "" Then
+    If range("A1").value = "Product ID" And range("B1").value = "Description" And range("C1").value = "Location" And range("D1").value = "QoH" And range("E1").value = "Reorder Point" _
+    And range("F1").value = "Quantity Sold" And Not range("A2").value = "" And range("A3").value = "" And range("D2").value = "" And range("E2").value = "" And range("F2").value = "" Then
         CheckWeekInv = True
     Else
         CheckWeekInv = False
@@ -92,7 +96,7 @@ End Function
 
 Public Function CheckWeekInvEnd() As Boolean
 
-    If Range("A1").Value = "Count" And Range("B1").Value = "Product ID" And Range("C1").Value = "Description" And Range("D1").Value = "Location" And Range("E1").Value = "QoH" And Range("F1").Value = "Quantity Sold" Then
+    If range("A1").value = "Count" And range("B1").value = "Product ID" And range("C1").value = "Description" And range("D1").value = "Location" And range("E1").value = "QoH" And range("F1").value = "Quantity Sold" Then
         CheckWeekInvEnd = True
     Else
         CheckWeekInvEnd = False
@@ -102,11 +106,11 @@ End Function
 
 Public Function CheckFinaleProducts() As Boolean
 
-    If Range("A1").Value = "Product ID" And Range("B1").Value = "Description" And Range("C1").Value = "Category" And Range("D1").Value = "Notes" And Range("E1").Value = "Std reorder point" And _
-    Range("F1").Value = "Std reorder in qty of" And Range("G1").Value = "Manufacturer" And Range("H1").Value = "Mfg product ID" And Range("I1").Value = "Supplier 1" And _
-    Range("J1").Value = "Supplier 1 price" And Range("K1").Value = "Supplier 1 product ID" And Range("L1").Value = "Supplier 1 comments" And Range("M1").Value = "Location" And _
-    Range("N1").Value = "Interchange 1" And Range("O1").Value = "Interchange 2" And Range("P1").Value = "Interchange 3" And Range("Q1").Value = "Interchange 4" And _
-    Range("R1").Value = "Listing Status" And Range("S1").Value = "Sorting" Then
+    If range("A1").value = "Product ID" And range("B1").value = "Description" And range("C1").value = "Category" And range("D1").value = "Notes" And range("E1").value = "Std reorder point" And _
+    range("F1").value = "Std reorder in qty of" And range("G1").value = "Manufacturer" And range("H1").value = "Mfg product ID" And range("I1").value = "Supplier 1" And _
+    range("J1").value = "Supplier 1 price" And range("K1").value = "Supplier 1 product ID" And range("L1").value = "Supplier 1 comments" And range("M1").value = "Location" And _
+    range("N1").value = "Interchange 1" And range("O1").value = "Interchange 2" And range("P1").value = "Interchange 3" And range("Q1").value = "Interchange 4" And _
+    range("R1").value = "Listing Status" And range("S1").value = "Sorting" Then
         
         CheckFinaleProducts = True
     Else
@@ -115,9 +119,9 @@ Public Function CheckFinaleProducts() As Boolean
 
 End Function
 
-Public Function PartNumMatch(PRange As Range) As Boolean
+Public Function PartNumMatch(PRange As range) As Boolean
 
-    If PRange.Value = PartName Then
+    If PRange.value = PartName Then
         PartNumMatch = True
     Else
         PartNumMatch = False
@@ -131,38 +135,40 @@ Public Function CheckManageInv() As Boolean
     CheckManageInv = False
     
     Dim c As Integer
-    Dim R As Integer
-    Dim p As Range
+    Dim r As Integer
+    Dim p As range
     
     'find the top-left-most cell
     For c = 1 To 14
         'loop through columns
         If Application.CountA(columns(c)) > 0 Then
             'loop through rows
-            For R = 1 To 5
-                If Not Cells(R, c).Text = "" Then
+            For r = 1 To 5
+                If Not Cells(r, c).value = "" Then
                     'save cell to variable
-                    Set p = Cells(R, c)
+                    Set p = Cells(r, c)
                     GoTo Exit_Loop
 
                 End If
-            Next R
+            Next r
         End If
     Next c
     
 Exit_Loop:
     
     'if A1 = "Status" and A2 = "Active" or "Inactive" or "Variations" then the sheet has already been formatted, leave as false
-    If p.Value = "Status " And p.Offset(0, 1).Value = "Image" And p.Offset(0, 2).Value = "SKU " Then
-        'if top-left-most cell is Status and the other headers are there and it's not been formatted, then set function to true
-        If Not Range("A1").Value = "Status " And Not (Range("A2").Value = "Active " Or Range("A2").Value Like "Inactive*" Or Range("A2").Value Like "Variations*" Or Range("A2").Value = "Suppressed ") Then
-            CheckManageInv = True
+    If Not p Is Nothing Then
+        If p.value = "Status " And p.Offset(0, 1).value = "Image" And p.Offset(0, 2).value = "SKU " Then
+            'if top-left-most cell is Status and the other headers are there and it's not been formatted, then set function to true
+            If Not range("A1").value = "Status " And Not (range("A2").value = "Active " Or range("A2").value Like "Inactive*" Or range("A2").value Like "Variations*" Or range("A2").value = "Suppressed ") Then
+                CheckManageInv = True
+            End If
         End If
     End If
     
     'clear variables
     c = 0
-    R = 0
+    r = 0
     Set p = Nothing
 
 End Function
@@ -172,27 +178,38 @@ Public Function CheckAllFinaleProducts() As Boolean
     CheckAllFinaleProducts = False
     
     'if fields for all products report from Finale are found AND column B has "Inactive" values then function returns true
-    If Range("A1").Value = "Product ID" And Range("B1").Value = "Status" And Range("C1").Value = "Description" And Range("D1").Value = "Category" And Range("E1").Value = "Notes" And _
-    Range("F1").Value = "Std accounting cost" And Range("G1").Value = "Std buy price" And Range("H1").Value = "Item price" And Range("I1").Value = "Case price" And _
-    Range("J1").Value = "Std lead days" And Range("K1").Value = "Std packing" And Range("L1").Value = "Std packing units per case" And Range("M1").Value = "Unit of measure" And _
-    Not Range("B:B").Find("Inactive") Is Nothing Then CheckAllFinaleProducts = True
+    If range("A1").value = "Product ID" And range("B1").value = "Status" And range("C1").value = "Description" And range("D1").value = "Category" And range("E1").value = "Notes" And _
+    range("F1").value = "Std accounting cost" And range("G1").value = "Std buy price" And range("H1").value = "Item price" And range("I1").value = "Case price" And _
+    range("J1").value = "Std lead days" And range("K1").value = "Std packing" And range("L1").value = "Std packing units per case" And range("M1").value = "Unit of measure" And _
+    Not range("B:B").Find("Inactive") Is Nothing Then CheckAllFinaleProducts = True
 
 End Function
 
-Public Function IsArrayAllocated(Arr As Variant) As Boolean
+Public Function IsArrayAllocated(arr As Variant) As Boolean
     On Error Resume Next
     'checks if array is allocated
-    IsArrayAllocated = IsArray(Arr) And Not IsError(LBound(Arr, 1)) And LBound(Arr, 1) <= UBound(Arr, 1)
+    IsArrayAllocated = IsArray(arr) And Not IsError(LBound(arr, 1)) And LBound(arr, 1) <= UBound(arr, 1)
 
 End Function
 
-Public Function CheckBoM() As Boolean
-
-    CheckBoM = False
+Public Function CheckBoM() As String
     
     'check fields and empty cells to determine if BoM report
-    If Range("A1").Text = "Product ID" And Range("B1").Text = "Description" And Range("C1").Text = "Quantity" And Range("D1").Text = "Product ID" And Range("E1").Text = "Description" And _
-    Range("F1").Text = "Component note" And Range("A2").Text <> "" And Range("A3").Text = "" Then CheckBoM = True
+    If range("A1").value = "Product ID" And range("B1").value = "Description" And range("C1").value = "Quantity" And range("D1").value = "Product ID" And range("E1").value = "Description" And _
+    range("F1").value = "Component note" And range("A2").value <> "" And range("A3").value = "" Then
+        CheckBoM = "Raw"
+    Else
+        If (range("A1").value = "Product ID" And range("B1").value = "Quantity" And range("C1").value = "Component Product ID") Or _
+        (range("A1").value = "Product ID" And range("B1").value = "Quantity" And range("C1").value = "Component Product ID" And range("D1").value = "Component note") Then
+            CheckBoM = "Compact"
+        Else
+            If range("A1").value = "Product ID" And range("B1").value = "BoM 1" And range("C1").value = "Qty 1" Then
+                CheckBoM = "Expanded"
+            Else
+                CheckBoM = ""
+            End If
+        End If
+    End If
 
 End Function
 
@@ -200,24 +217,24 @@ Public Function CheckAmazonTemplate() As Boolean
 
     CheckAmazonTemplate = False
     
-    If Range("A1").Value Like "TemplateType=*" And _
-    Range("B1").Value Like "Version=*" And _
-    Range("C1").Value Like "TemplateSignature=*" And _
-    Range("D1").Value = "The top 3 rows are for Amazon.com use only. Do not modify or delete the top 3 rows." Then CheckAmazonTemplate = True
+    If range("A1").value Like "TemplateType=*" And _
+    range("B1").value Like "Version=*" And _
+    range("C1").value Like "TemplateSignature=*" And _
+    range("D1").value = "The top 3 rows are for Amazon.com use only. Do not modify or delete the top 3 rows." Then CheckAmazonTemplate = True
 
 End Function
 
 Public Function CheckUPC() As Boolean
 
-    If Range("A1").Value = "Action" And Range("B1").Value = "GS1CompanyPrefix" And Range("C1").Value = "GTIN" And Range("D1").Value = "PackagingLevel" And _
-    Range("E1").Value = "Description" And Range("F1").Value = "SKU" And Range("G1").Value = "BrandName" And Range("H1").Value = "Status" And _
-    Range("I1").Value = "IsVariable" And Range("J1").Value = "IsPurchasable" And Range("K1").Value = "Certified" And Range("L1").Value = "Height" And _
-    Range("M1").Value = "Width" And Range("N1").Value = "Depth" And Range("O1").Value = "DimensionMeasure" And Range("P1").Value = "GrossWeight" And _
-    Range("Q1").Value = "NetWeight" And Range("R1").Value = "WeightMeasure" And Range("S1").Value = "Comments" And Range("T1").Value = "CountryOfOrigin" And _
-    Range("U1").Value = "ChildGTINs" And Range("V1").Value = "Quantity" And Range("W1").Value = "SubBrandName" And Range("X1").Value = "ProductDescriptionShort" And _
-    Range("Y1").Value = "LabelDescription" And Range("Z1").Value = "NetContent1Count" And Range("AA1").Value = "NetContent1UnitOfMeasure" And Range("AB1").Value = "NetContent2Count" And _
-    Range("AC1").Value = "NetContent2UnitOfMeasure" And Range("AD1").Value = "NetContent3Count" And Range("AE1").Value = "NetContent3UnitOfMeasure" And _
-    Range("AF1").Value = "GlobalProductClassification" And Range("AG1").Value = "ImageURL" And Range("AH1").Value = "TargetMarket" Then
+    If range("A1").value = "Action" And range("B1").value = "GS1CompanyPrefix" And range("C1").value = "GTIN" And range("D1").value = "PackagingLevel" And _
+    range("E1").value = "Description" And range("F1").value = "SKU" And range("G1").value = "BrandName" And range("H1").value = "Status" And _
+    range("I1").value = "IsVariable" And range("J1").value = "IsPurchasable" And range("K1").value = "Certified" And range("L1").value = "Height" And _
+    range("M1").value = "Width" And range("N1").value = "Depth" And range("O1").value = "DimensionMeasure" And range("P1").value = "GrossWeight" And _
+    range("Q1").value = "NetWeight" And range("R1").value = "WeightMeasure" And range("S1").value = "Comments" And range("T1").value = "CountryOfOrigin" And _
+    range("U1").value = "ChildGTINs" And range("V1").value = "Quantity" And range("W1").value = "SubBrandName" And range("X1").value = "ProductDescriptionShort" And _
+    range("Y1").value = "LabelDescription" And range("Z1").value = "NetContent1Count" And range("AA1").value = "NetContent1UnitOfMeasure" And range("AB1").value = "NetContent2Count" And _
+    range("AC1").value = "NetContent2UnitOfMeasure" And range("AD1").value = "NetContent3Count" And range("AE1").value = "NetContent3UnitOfMeasure" And _
+    range("AF1").value = "GlobalProductClassification" And range("AG1").value = "ImageURL" And range("AH1").value = "TargetMarket" Then
         CheckUPC = True
     End If
 
@@ -225,11 +242,11 @@ End Function
 
 Public Function CheckDropship() As String
 
-    If Range("A1").Value = "Item" And Range("B1").Value = "Desc" And Range("C1").Value = "customer" And Range("D1").Value = "so" And Range("E1").Value = "Qty Sold" And _
-    Range("F1").Value = "Unit Price" And Range("G1").Value = "Total Amount" And Range("H1").Value = "TaxCode" And Range("I1").Value = "" Then
+    If range("A1").value = "Item" And range("B1").value = "Desc" And range("C1").value = "customer" And range("D1").value = "so" And range("E1").value = "Qty Sold" And _
+    range("F1").value = "Unit Price" And range("G1").value = "Total Amount" And (range("H1").value = "TaxCode" Or range("I1").value = "") Then
         CheckDropship = "Herko"
-    ElseIf Range("A1").Value = "Date - Shipped Date" And Range("B1").Value = "Customer Email" And Range("C1").Value = "Ship To - Name" And Range("D1").Value = "Amount - Order Total" And _
-    Range("E1").Value = "Amount - Shipping Cost" And Range("F1").Value = "" Then
+    ElseIf range("A1").value = "Date - Shipped Date" And range("B1").value = "Customer Email" And range("C1").value = "Ship To - Name" And range("D1").value = "Amount - Order Subtotal" And _
+    range("E1").value = "Amount - Shipping Cost" And range("F1").value = "" Then
         CheckDropship = "Shipstation"
     Else
         CheckDropship = ""
@@ -239,7 +256,7 @@ End Function
 
 Public Function CheckHerkoDropship() As Boolean
     
-    If Range("A1").Value = "Date" And Range("B1").Value = "Client Name" And Range("C1").Value = "qb#" And Range("D1").Value = "Qty" And Range("E1").Value = "Unit Price" And Range("F1").Value = "Total" And Range("G1").Value = "SO #" And Range("H1").Value = "SHIPPING" And Range("I1").Value = "" Then
+    If range("A1").value = "Date" And range("B1").value = "Client Name" And range("C1").value = "qb#" And range("D1").value = "Qty" And range("E1").value = "Unit Price" And range("F1").value = "Total" And range("G1").value = "SO #" And range("H1").value = "SHIPPING" And range("I1").value = "" Then
         CheckHerkoDropship = True
     Else
         CheckHerkoDropship = False
@@ -249,9 +266,9 @@ End Function
 
 Public Function CheckShipstationDropship()
 
-    If Range("A1").Value = "Amount - Order Total" And Range("B1").Value = "Ship To - Company" And Range("C1").Value = "Ship To - Name" And Range("D1").Value = "Ship To - Country" And Range("E1").Value = "Bill To - Name" And _
-    Range("F1").Value = "Service - Package Type" And Range("G1").Value = "Service - Confirmation Type" And Range("H1").Value = "Dimensions - Height" And Range("I1").Value = "Tags" And Range("J1").Value = "Insurance - Cost" And _
-    Range("K1").Value = "Ship To - Zone" And Range("L1").Value = "Count - Number of Items" Then
+    If range("A1").value = "Amount - Order Total" And range("B1").value = "Ship To - Company" And range("C1").value = "Ship To - Name" And range("D1").value = "Ship To - Country" And range("E1").value = "Bill To - Name" And _
+    range("F1").value = "Service - Package Type" And range("G1").value = "Service - Confirmation Type" And range("H1").value = "Dimensions - Height" And range("I1").value = "Tags" And range("J1").value = "Insurance - Cost" And _
+    range("K1").value = "Ship To - Zone" And range("L1").value = "Count - Number of Items" Then
         CheckShipstationDropship = True
     Else
         CheckShipstationDropship = False
@@ -261,7 +278,7 @@ End Function
 
 Public Function CheckFormattedHerko() As Boolean
 
-    If Range("A1").Value = "Date" And Range("B1").Value = "Client Name" And Range("C1").Value = "qb#" Then
+    If range("A1").value = "Date" And range("B1").value = "Client Name" And range("C1").value = "qb#" Then
         CheckFormattedHerko = True
     End If
 
@@ -269,9 +286,9 @@ End Function
 
 Public Function CheckFormattedDropship() As Boolean
 
-    If Range("A1").Value = "Item" And Range("B1").Value = "Desc" And Range("C1").Value = "customer" And Range("D1").Value = "so" And Range("E1").Value = "Qty Sold" And _
-    Range("F1").Value = "Unit Price" And Range("G1").Value = "Total Amount" And Range("H1").Value = "Shipping Cost" And Range("I1").Value = "AD Total Price" And _
-    Range("K1").Value = "Profit/Loss" And Range("L1").Value = "" Then
+    If range("A1").value = "Item" And range("B1").value = "Desc" And range("C1").value = "customer" And range("D1").value = "so" And range("E1").value = "Qty Sold" And _
+    range("F1").value = "Unit Price" And range("G1").value = "Total Amount" And range("H1").value = "Shipping Cost" And range("I1").value = "AD Total Price" And _
+    range("K1").value = "Profit/Loss" And range("L1").value = "" Then
         CheckFormattedDropship = True
     End If
 
@@ -308,10 +325,24 @@ Public Function CheckVolumePricing()
 
     CheckVolumePricing = False
     
-    If Range("A1").Value = "SKU" And Range("B1").Value = "Offset Type(Amount or Percentage)" And Range("C1").Value = "T1 Min. Qty" And Range("D1").Value = "T1 Max. Qty" And _
-    Range("E1").Value = "T1 Offset Value" And Range("F1").Value = "T2 Min. Qty" And Range("G1").Value = "T2 Max. Qty" And Range("H1").Value = "T2 Offset Value" And _
-    Range("I1").Value = "T3 Min. Qty" And Range("J1").Value = "T3 Max. Qty" And Range("K1").Value = "T3 Offset Value" And Range("L1").Value = "T4 Min. Qty" And _
-    Range("M1").Value = "T4 Max. Qty" And Range("N1").Value = "T4 Offset Value" Then CheckVolumePricing = True
+    If range("A1").value = "SKU" And range("B1").value = "Offset Type(Amount or Percentage)" And range("C1").value = "T1 Min. Qty" And range("D1").value = "T1 Max. Qty" And _
+    range("E1").value = "T1 Offset Value" And range("F1").value = "T2 Min. Qty" And range("G1").value = "T2 Max. Qty" And range("H1").value = "T2 Offset Value" And _
+    range("I1").value = "T3 Min. Qty" And range("J1").value = "T3 Max. Qty" And range("K1").value = "T3 Offset Value" And range("L1").value = "T4 Min. Qty" And _
+    range("M1").value = "T4 Max. Qty" And range("N1").value = "T4 Offset Value" Then
+        
+        CheckVolumePricing = True
+        
+    End If
 
 End Function
 
+Public Function CheckShippingMethods()
+
+    If range("A1").value = "Product ID" And range("B1").value = "Ebay Shipping Method" And range("C1").value = "Ebay Shipping Cost" And _
+    range("D1").value = "Amazon Shipping Method" And range("E1").value = "Amazon Shipping Cost" Then
+        
+        CheckShippingMethods = True
+        
+    End If
+
+End Function

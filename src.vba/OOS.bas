@@ -5,15 +5,16 @@ Public Sub OOSMain()
     'Turn screen updating off
     Application.ScreenUpdating = False
     
-    'BypassRibbon = True
-    
     'Delete useless columns
-    columns("B:D").Delete
+    columns("B:F").Delete
     
     'Move My Note to column E
     MoveMyNote
     
-    'Deletes rows of any cell in A that's not a SKU
+    'Deletes rows with Ebay note:
+    DeleteEbayNote
+    
+    'Deletes anything left that's not SKUs
     DeleteNonSKUs
     
     'Delete empy Rows
@@ -24,13 +25,11 @@ Public Sub OOSMain()
     
     'Format sheet
     Headers
-    Range("A:A").EntireColumn.AutoFit
-    Range("A2").Select
+    range("A:A").EntireColumn.AutoFit
+    range("A2").Select
     
     'Turn screen updating on
     Application.ScreenUpdating = True
-    
-    BypassRibbon = False
     
     RibbonCategories
 
@@ -38,21 +37,31 @@ End Sub
 
 Private Sub MoveMyNote()
 
-    Dim R As Range
+    Dim r As range
     
-    For Each R In Intersect(Range("A:A"), ActiveSheet.UsedRange)
-        If R.Value Like "My note:*" Then R.Cut Destination:=R.Offset(-2, 1)  'move My Note to column B and up 2 rows
-    Next R
+    For Each r In Intersect(range("A:A"), ActiveSheet.UsedRange)
+        If r.value Like "My note:*" Then r.Cut Destination:=r.Offset(-2, 1)  'move My Note to column B and up 2 rows
+    Next r
+
+End Sub
+
+Private Sub DeleteEbayNote()
+
+    Dim r As range
+    
+    For Each r In Intersect(range("A:A"), ActiveSheet.UsedRange)
+        If r.value Like "eBay note:*" Then r.EntireRow.Delete    'anything that's not a sku in column A gets deleted
+    Next r
 
 End Sub
 
 Private Sub DeleteNonSKUs()
 
-    Dim R As Range
+    Dim r As range
     
-    For Each R In Intersect(Range("A:A"), ActiveSheet.UsedRange)
-        If R.Value = "Select this item for performing bulk action" Or R.Value Like "eBay note:*" Then R.EntireRow.Delete    'anything that's not a sku in column A gets deleted
-    Next R
+    For Each r In Intersect(range("A:A"), ActiveSheet.UsedRange)
+        If r.value Like "Select this item for performing bulk action*" Then r.EntireRow.Delete    'anything that's not a sku in column A gets deleted
+    Next r
 
 End Sub
 
@@ -66,9 +75,9 @@ Private Sub DeleteRows()
     
     'go through every row
     For i = 2 To EndRange
-        If IsEmpty(Range("A" & i)) Then
+        If IsEmpty(range("A" & i)) Then
             'if cell A is blank, delete the whole row
-            Range(i & ":" & i).EntireRow.Delete
+            range(i & ":" & i).EntireRow.Delete
             
             'go back one row to account for the rows shifting up after deleting
             i = i - 1
@@ -87,27 +96,27 @@ End Sub
 
 Private Sub PruneProducts()
 
-    Dim R As Integer
+    Dim r As Integer
     Dim i As Integer
     
     'find last row
     i = LastRow("A:A")
     
     'loop through all rows except the first one to reserve it for headers
-    For R = 2 To i
+    For r = 2 To i
         'if Column B starts with "My note" then delete the row
-        If Range("B" & R).Value Like "My note:*" Then
-            Range("B" & R).EntireRow.Delete
+        If range("B" & r).value Like "My note:*" Then
+            range("B" & r).EntireRow.Delete
             
             'Go back up one row to account for the rows shifting up after deleting
-            R = R - 1
+            r = r - 1
         End If
-    Next R
+    Next r
 
 End Sub
 
 Private Sub Headers()
 
-    Range("A1").Value = "Ebay SKU"
+    range("A1").value = "Ebay SKU"
 
 End Sub

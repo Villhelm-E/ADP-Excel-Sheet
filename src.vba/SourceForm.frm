@@ -7,9 +7,8 @@ Private Sub UserForm_Initialize()
 
 On Error GoTo UserForm_Initialize_Err
 
-    Me.StartUpPosition = 0
-    Me.Left = Application.Left + (0.5 * Application.Width) - (0.5 * Me.Width)
-    Me.Top = Application.Top + (0.5 * Application.Height) - (0.5 * Me.Height)
+    'position userform
+    Call CenterForm(SourceForm)
     
     'load parttypes into combobox
     LoadPartTypes
@@ -21,9 +20,9 @@ On Error GoTo UserForm_Initialize_Err
     ReopenForm
     
     'position the userform
-    Me.StartUpPosition = 0
-    Me.Left = Application.Left + (0.5 * Application.Width) - (0.5 * Me.Width)
-    Me.Top = Application.Top + (0.5 * Application.Height) - (0.5 * Me.Height)
+    Me.startupposition = 0
+    Me.left = Application.left + (0.5 * Application.width) - (0.5 * Me.width)
+    Me.top = Application.top + (0.5 * Application.height) - (0.5 * Me.height)
     
 UserForm_Initialize_Exit:
     On Error Resume Next
@@ -80,13 +79,13 @@ Private Sub ReopenForm()
     'if reopen = false, the user is entering the part number and interchange source for the first time
     'true means user has to reenter the info
     If Reopen = False Then
-        Me.BrandLabel.Top = 66
-        Me.BrandCombo.Top = 84
-        Me.PartTypeLabel.Top = 120
-        Me.PartTypeCombo.Top = 138
-        Me.CancelBtn.Top = 174
-        Me.FormatBtn.Top = 174
-        Me.Height = 231
+        Me.BrandLabel.top = 66
+        Me.BrandCombo.top = 84
+        Me.PartTypeLabel.top = 120
+        Me.PartTypeCombo.top = 138
+        Me.CancelBtn.top = 174
+        Me.FormatBtn.top = 174
+        Me.height = 231
         Me.FitmentSourceCombo.Enabled = False
         Me.FitmentSourceLabel.Enabled = False
         Me.FitmentSourceCombo.Visible = False
@@ -121,48 +120,91 @@ End Sub
 
 Private Sub FormatBtn_Click()
 
-    'Make sure user entered part number and part type
-    If Me.PartNumBox.Value = "" Or Me.PartTypeCombo.Value = "" Then
-        MsgBox "Please enter required fields"
+    If Reopen = False Then
+        'Make sure user entered part number and part type
+        If Me.PartNumBox.value = "" Or Me.PartTypeCombo.value = "" Then
+            MsgBox ("Please enter required fields")
+        Else
+            PartName = Me.PartNumBox.value                          'PartName is global variable
+            PartTypeVar = Me.PartTypeCombo.value                    'PartTypeVar is global variable
+            Brand = Me.BrandCombo.value                             'Brand is global variable
+            
+            'save user entries to global variables
+            If Me.InterchangeBox.value = "" Then
+                InterchangeSource = PartName                        'InterchangeSource is global variable
+            Else
+                InterchangeSource = Me.InterchangeBox.value
+            End If
+            
+            If Reopen = True And Me.FitmentSourceCombo.Enabled = True Then
+                FitmentSource = Me.FitmentSourceCombo.value         'FitmentSource is global variable
+            End If
+            
+            'generate SKU
+            Dim prefix As String
+            Dim suffix As String
+            
+            'grab suffix code
+            Set rst = MstrDb.Execute("SELECT SuffixCode FROM Manufacturers WHERE [ManufacturerFull] = " & Chr(34) & Me.BrandCombo.value & Chr(34))
+            suffix = rst.fields("SuffixCode").value
+            rst.Close
+            
+            'grab prefix code
+            Set rst = MstrDb.Execute("SELECT PrefixCode FROM AAIAPartTypes WHERE [AAIAPartType] = " & Chr(34) & Me.PartTypeCombo.value & Chr(34))
+            prefix = rst.fields("PrefixCode").value
+            rst.Close
+            
+            If InStr(1, Me.PartNumBox.value, "+") > 0 Then
+                gendSKU = prefix & "-" & Me.PartNumBox.value    'gendSKU is global variable
+            Else
+                gendSKU = prefix & "-" & Me.PartNumBox.value & "-" & suffix
+            End If
+            
+            'close
+            'only unload userform if user has entered in all required fields
+            Unload Me
+        End If
     Else
-        PartName = Me.PartNumBox.Value                          'PartName is global variable
-        PartTypeVar = Me.PartTypeCombo.Value                    'PartTypeVar is global variable
-        Brand = Me.BrandCombo.Value                             'Brand is global variable
-        
-        'save user entries to global variables
-        If Me.InterchangeBox.Value = "" Then
-            InterchangeSource = PartName                        'InterchangeSource is global variable
+        'Make sure user entered part number and part type
+        If Me.PartNumBox.value = "" Or Me.PartTypeCombo.value = "" Then
+            MsgBox ("Please enter required fields")
         Else
-            InterchangeSource = Me.InterchangeBox.Value
+            PartName = Me.PartNumBox.value                          'PartName is global variable
+            PartTypeVar = Me.PartTypeCombo.value                    'PartTypeVar is global variable
+            Brand = Me.BrandCombo.value                             'Brand is global variable
+            
+            'save user entries to global variables
+            If Me.InterchangeBox.value = "" Then
+                InterchangeSource = PartName                        'InterchangeSource is global variable
+            Else
+                InterchangeSource = Me.InterchangeBox.value
+            End If
+            
+            If Reopen = True And Me.FitmentSourceCombo.Enabled = True Then
+                FitmentSource = Me.FitmentSourceCombo.value         'FitmentSource is global variable
+            End If
+            
+            'generate SKU
+            'grab suffix code
+            Set rst = MstrDb.Execute("SELECT SuffixCode FROM Manufacturers WHERE [ManufacturerFull] = " & Chr(34) & Me.BrandCombo.value & Chr(34))
+            suffix = rst.fields("SuffixCode").value
+            rst.Close
+            
+            'grab prefix code
+            Set rst = MstrDb.Execute("SELECT PrefixCode FROM AAIAPartTypes WHERE [AAIAPartType] = " & Chr(34) & Me.PartTypeCombo.value & Chr(34))
+            prefix = rst.fields("PrefixCode").value
+            rst.Close
+            
+            If InStr(1, Me.PartNumBox.value, "+") > 0 Then
+                gendSKU = prefix & "-" & Me.PartNumBox.value    'gendSKU is global variable
+            Else
+                gendSKU = prefix & "-" & Me.PartNumBox.value & "-" & suffix
+            End If
+            
+            'close
+            'only unload userform if user has entered in all required fields
+            Unload Me
         End If
-        
-        If Reopen = True And Me.FitmentSourceCombo.Enabled = True Then
-            FitmentSource = Me.FitmentSourceCombo.Value         'FitmentSource is global variable
-        End If
-        
-        'generate SKU
-        Dim prefix As String
-        Dim suffix As String
-        
-        'grab suffix code
-        Set rst = MstrDb.Execute("SELECT SuffixCode FROM Manufacturers WHERE [ManufacturerFull] = " & Chr(34) & Me.BrandCombo.Value & Chr(34))
-        suffix = rst.Fields("SuffixCode").Value
-        rst.Close
-        
-        'grab prefix code
-        Set rst = MstrDb.Execute("SELECT PrefixCode FROM AAIAPartTypes WHERE [AAIAPartType] = " & Chr(34) & Me.PartTypeCombo.Value & Chr(34))
-        prefix = rst.Fields("PrefixCode").Value
-        rst.Close
-        
-        If InStr(1, Me.PartNumBox.Value, "+") > 0 Then
-            gendSKU = prefix & "-" & Me.PartNumBox.Value    'gendSKU is global variable
-        Else
-            gendSKU = prefix & "-" & Me.PartNumBox.Value & "-" & suffix
-        End If
-        
-        'close
-        'only unload userform if user has entered in all required fields
-        Unload Me
     End If
 
 End Sub
@@ -172,7 +214,7 @@ Private Sub CancelBtn_Click()
     'wipe variables
     PartName = ""
     InterchangeSource = ""
-    Me.PartTypeCombo.Value = ""
+    Me.PartTypeCombo.value = ""
     
     'Close form
     SourceForm.Hide

@@ -7,12 +7,10 @@ Public Incomplete As Boolean
 Private Sub UserForm_Initialize()
 
     'position the userform
-    Me.StartUpPosition = 0
-    Me.Left = Application.Left + (0.5 * Application.Width) - (0.5 * Me.Width)
-    Me.Top = Application.Top + (0.5 * Application.Height) - (0.5 * Me.Height)
+    Call CenterForm(ListAmazon)
     
     'count number of pages and save to global variable PageCount
-    PageCount = MultiPage1.Pages.Count - 1  'subtract 1 to account for first page being 0
+    PageCount = MultiPage1.Pages.count - 1  'subtract 1 to account for first page being 0
     
     'rename userform caption
     ListAmazon.Caption = "List on Amazon (" & MultiPage1.SelectedItem.Caption & ")"
@@ -23,46 +21,198 @@ Private Sub UserForm_Initialize()
     'disable back button
     Me.PreviousPage.Enabled = False
     
+    'disable buttons for unfinished code
+    Me.SetListing.Enabled = False
+    Me.ExistingSingleListing.Enabled = False
+    Me.UpdateListing.Enabled = False
+    
     'go to first page
-    MultiPage1.Value = 0
+    MultiPage1.value = 0
     
     'hide tabs from multipage, to look cleaner
     MultiPage1.Style = fmTabStyleNone
     
     'populate combo boxes
-    comboBoxes
+    ComboBoxes
     
     'Assume the part is New
-    Me.condition_type.Value = "New"
+    Me.condition_type.value = "New"
+    
+    'Assume part type is not spark plug
+    Me.PlugType.Enabled = False
+    Me.PlugTypeLabel.Enabled = False
     
     'Assume the part is vehicle specific
-    Me.fit_type.Value = "Vehicle Specific"
+    Me.fit_type.value = "Vehicle Specific"
+    
+'    'Add controls to test page
+'    AddControls
     
     'Adds asterisk to required fields
     RequiredFields
 
 End Sub
 
+Private Sub MultiPage1_Change()
+
+    'decide when to enable or disable the Previous page button
+    If MultiPage1.value <= 0 Then
+        Me.PreviousPage.Enabled = False
+    Else
+        Me.PreviousPage.Enabled = True
+    End If
+    
+    'change Next button to List button on the last page
+    If MultiPage1.value >= PageCount Or MultiPage1.value = 0 Then   'PageCount is global variable
+        Me.NextPage.Enabled = False
+    Else
+        Me.NextPage.Enabled = True
+    End If
+    
+'    'Determine which pages to show based on the type of listing the user chose
+'    Select Case ListingMode
+'        Case "Bundle"
+'            Dim i As Integer
+'
+'            'hide all pages
+'            For i = 1 To PageCount - 1
+'                MultiPage1.Pages(i).Visible = False
+'            Next i
+'
+'            'make the Bundle page the only visible page
+'            MultiPage1.Pages(4).Visible = True
+'            MultiPage1.Value = 4
+'
+'        Case Else
+'            'hide all pages
+'            For i = 1 To PageCount
+'                MultiPage1.Pages(i).Visible = True
+'            Next i
+'
+'            MultiPage1.Pages(4).Visible = False
+'    End Select
+    
+    'rename userform caption based on page caption
+    ListAmazon.Caption = "List on Amazon (" & MultiPage1.SelectedItem.Caption & ")"
+    
+    'If user is on Part page run PartInfoSub
+    If ListAmazon.Caption Like "*Part*" Then
+        PartInfoSub
+    End If
+    
+    'If user is on Parentage page run
+    If ListAmazon.Caption Like "*Parentage*" Then
+        Me.parent_sku.value = GenSKU(True)
+    End If
+    
+    'If user is on Review page run ReviewPageSub
+    If ListAmazon.Caption Like "*Review*" Then
+        ReviewPageSub
+    End If
+    
+    'If user is on second page change the caption of the back/cancel button
+    If MultiPage1.value = 1 Then
+        Me.PreviousPage.Caption = "Start Over"
+    Else
+        Me.PreviousPage.Caption = "Back"
+    End If
+    
+    'check if parentage is selected
+    ParentagePageCheck
+
+End Sub
+
 Private Sub brand_name_Change()
 
-    If Me.brand_name.Value <> "" Then
+    If Me.brand_name.value <> "" Then
         Me.BrandLabel.ForeColor = RGB(0, 0, 0)
     End If
 
 End Sub
 
+'Private Sub AddControls()
+'
+'    'ProgIDs for adding controls with VBA
+'    'CheckBox           Forms.CheckBox.1
+'    'ComboBox           Forms.ComboBox.1
+'    'CommandButton      Forms.CommandButton.1
+'    'Frame              Forms.Frame.1
+'    'Image              Forms.Image.1
+'    'Label              Forms.Label.1
+'    'ListBox            Forms.ListBox.1
+'    'MultiPage          Forms.MultiPage.1
+'    'OptionButton       Forms.OptionButton.1
+'    'ScrollBar          Forms.ScrollBar.1
+'    'SpinButton         Forms.SpinButton.1
+'    'TabStrip           Forms.TabStrip.1
+'    'TextBox            Forms.TextBox.1
+'    'ToggleButton       Forms.ToggleButton.1
+'
+'    'Control Variable
+'    Dim AddedControl As control
+'
+'    'Variables for Adding Controls
+'    Dim TextBoxes As msforms.TextBox
+'    Dim Labels As msforms.LABEL
+'    Dim CheckBoxes As msforms.CheckBox
+'    Dim ComboBoxes As msforms.ComboBox
+'    Dim CommandButtons As msforms.CommandButton
+'
+'    'Add Controls
+'    Set TextBoxes = MultiPage1.Pages(3).Controls.Add("Forms.TextBox.1", "Part1", True)
+'    Set Labels = MultiPage1.Pages(3).Controls.Add("Forms.Label.1", "Part1Label", True)
+'    Set TextBoxes = MultiPage1.Pages(3).Controls.Add("Forms.TextBox.1", "Part2", True)
+'
+'    MultiPage1.Pages(3).Part1.left = 132
+'    MultiPage1.Pages(3).Part1.top = 18
+'    MultiPage1.Pages(3).Part1.width = 96
+'    MultiPage1.Pages(3).Part1.height = 18
+'
+'
+'
+'    '
+'    For Each AddedControl In MultiPage1.Pages(3).Controls
+'        If AddedControl.name = "Part1" Then
+'            AddedControl.Left = 18
+'            AddedControl.Top = 18
+'            AddedControl.Width = 96
+'            AddedControl.Height = 18
+'        End If
+'    Next AddedControl
+'
+'    For Each AddedControl In MultiPage1.Pages(3).Controls
+'        If AddedControl.name = "Part1Label" Then
+'            AddedControl.Caption = "Label"
+'            AddedControl.Left = 132
+'            AddedControl.Top = 18
+'            AddedControl.Width = 96
+'            AddedControl.Height = 18
+'        End If
+'    Next AddedControl
+'
+'    For Each AddedControl In MultiPage1.Pages(3).Controls
+'        If AddedControl.name = "Part2" Then
+'            AddedControl.Left = 18
+'            AddedControl.Top = 54
+'            AddedControl.Width = 96
+'            AddedControl.Height = 18
+'        End If
+'    Next AddedControl
+'
+'End Sub
+
 Private Sub condition_type_Change()
 
     'check if condition is blank
-    If Me.condition_type.Value = "" Then
-        Me.condition_note.Value = ""
+    If Me.condition_type.value = "" Then
+        Me.condition_note.value = ""
         Me.condition_note.Enabled = False
         Me.NoteLabel.Enabled = False
         
         Me.ConditionLabel.ForeColor = RGB(255, 0, 0)
     Else
-        If Me.condition_type.Value = "New" Then
-            Me.condition_note.Value = ""
+        If Me.condition_type.value = "New" Then
+            Me.condition_note.value = ""
             Me.condition_note.Enabled = False
             Me.NoteLabel.Enabled = False
         Else
@@ -77,11 +227,11 @@ End Sub
 
 Private Sub external_product_id_AfterUpdate()
     
-    If IsNumeric(Me.external_product_id.Value) = True And Len(Me.external_product_id.Value) = 12 Then
+    If IsNumeric(Me.external_product_id.value) = True And Len(Me.external_product_id.value) = 12 Then
         Me.ProductIDLabel.ForeColor = RGB(0, 0, 0)
     Else
-        If Me.external_product_id.Value <> "" Then
-            MsgBox "Not a valid product ID"
+        If Me.external_product_id.value <> "" Then
+            MsgBox ("Not a valid product ID")
         End If
         Me.ProductIDLabel.ForeColor = RGB(255, 0, 0)
     End If
@@ -90,7 +240,7 @@ End Sub
 
 Private Sub fit_type_Change()
 
-    If Me.fit_type.Value = "" Then
+    If Me.fit_type.value = "" Then
         Me.FitmentTypeLabel.ForeColor = RGB(255, 0, 0)
     Else
         Me.FitmentTypeLabel.ForeColor = RGB(0, 0, 0)
@@ -113,7 +263,7 @@ Private Sub ParentagePageCheck()
     'Parentage page in Multipage should only appear if user checked the variations checkbox
     If Me.ParentageCheckBox = True Then
         Me.MultiPage1.Pages(parentagePage).Visible = True
-        Me.item_package_quantity.Value = ""
+        Me.item_package_quantity.value = ""
         Me.item_package_quantity.Enabled = False
         Me.QuantityLabel.Enabled = False
     Else
@@ -126,7 +276,7 @@ End Sub
 
 Private Sub part_number_Change()
 
-    If Me.part_number.Value <> "" Then
+    If Me.part_number.value <> "" Then
         Me.PartNumLabel.ForeColor = RGB(0, 0, 0)
     End If
 
@@ -134,9 +284,9 @@ End Sub
 
 Private Sub Manufacturer_Change()
 
-    If Me.Manufacturer.Value <> "" Then
+    If Me.Manufacturer.value <> "" Then
         Me.ManufacturerLabel.ForeColor = RGB(0, 0, 0)
-        If Me.Manufacturer.Value <> "AD Auto Parts" Then
+        If Me.Manufacturer.value <> "AD Auto Parts" Then
             Me.reboxed.Enabled = True
         Else
             Me.reboxed = False
@@ -148,7 +298,7 @@ End Sub
 
 Private Sub item_package_quantity_Change()
 
-    If Me.item_package_quantity.Value = "" Or IsNumeric(Me.item_package_quantity.Value) = False Then
+    If Me.item_package_quantity.value = "" Or IsNumeric(Me.item_package_quantity.value) = False Then
         Me.QuantityLabel.ForeColor = RGB(255, 0, 0)
     Else
         Me.QuantityLabel.ForeColor = RGB(0, 0, 0)
@@ -158,10 +308,20 @@ End Sub
 
 Private Sub part_type_id_Change()
 
-    If Me.part_type_id.Value = "" Then
-        Me.PartTypeLabel.ForeColor = RGB(255, 0, 0)
+    'if part type is Spark Plug, then enable the spark plug type combo box, otherwise disable
+    If Me.part_type_id.value = "Spark Plug" Then
+        Me.PlugType.Enabled = True
+        Me.PlugTypeLabel.Enabled = True
     Else
-        Me.PartTypeLabel.ForeColor = RGB(0, 0, 0)
+        If Me.part_type_id.value = "" Then
+            Me.PartTypeLabel.ForeColor = RGB(255, 0, 0)
+        Else
+            Me.PartTypeLabel.ForeColor = RGB(0, 0, 0)
+        End If
+        
+        Me.PlugType.value = ""
+        Me.PlugType.Enabled = False
+        Me.PlugTypeLabel.Enabled = False
     End If
 
 End Sub
@@ -169,17 +329,17 @@ End Sub
 Private Sub reboxed_Change()
 
     If Me.reboxed = True Then
-        Me.legal_disclaimer_description.Value = "Bulk packed. Not packaged in original manufacturer packaging. Packaged in AD Auto Parts packaging."
+        Me.legal_disclaimer_description.value = "Bulk packed. Not packaged in original manufacturer packaging. Packaged in AD Auto Parts packaging."
     ElseIf Me.reboxed = False Then
-        Me.legal_disclaimer_description.Value = Replace(Me.legal_disclaimer_description.Value, "Bulk packed. Not packaged in original manufacturer packaging. Packaged in AD Auto Parts packaging.", "")
-        If Left(Me.legal_disclaimer_description.Value, 1) = " " Then Me.legal_disclaimer_description.Value = Right(Me.condition_note.Value, Len(Me.condition_note.Value) - 1)
+        Me.legal_disclaimer_description.value = Replace(Me.legal_disclaimer_description.value, "Bulk packed. Not packaged in original manufacturer packaging. Packaged in AD Auto Parts packaging.", "")
+        If left(Me.legal_disclaimer_description.value, 1) = " " Then Me.legal_disclaimer_description.value = Right(Me.condition_note.value, Len(Me.condition_note.value) - 1)
     End If
 
 End Sub
 
 Private Sub standard_price_Change()
 
-    If Me.standard_price.Value = "" Or IsNumeric(Me.standard_price.Value) = False Then
+    If Me.standard_price.value = "" Or IsNumeric(Me.standard_price.value) = False Then
         Me.PriceLabel.ForeColor = RGB(255, 0, 0)
     Else
         Me.PriceLabel.ForeColor = RGB(0, 0, 0)
@@ -189,7 +349,7 @@ End Sub
 
 Private Sub merchant_shipping_group_name_Change()
 
-    If Me.merchant_shipping_group_name.Value = "" Then
+    If Me.merchant_shipping_group_name.value = "" Then
         Me.ShippingTemplateLabel.ForeColor = RGB(255, 0, 0)
     Else
         Me.ShippingTemplateLabel.ForeColor = RGB(0, 0, 0)
@@ -206,21 +366,21 @@ Private Sub ListButton_Click()
     'Headers
     If CheckAmazonTemplate = False Then Call AmazonHeaders     'Amazon module
     'Save the number and letter of the last column
-    lastcolumnletter = NumberToColumn(CountColumns(Range("2:2")))
+    lastcolumnletter = NumberToColumn(CountColumns(range("2:2")))
     
     'check if set
     Select Case ListingMode
-        Case "Single"
+        Case "ADP"
             If Me.ParentageCheckBox = False Then
                 Call ListSingle(CountRows("A:A") + 1, lastcolumnletter, False)
             Else
                 Call ListSets(lastcolumnletter)
             End If
         
-        Case "Set"
-            
+        Case "Bundle"
+            'Call ListBundle(lastcolumnletter)
         
-        Case "Existing"
+        Case "Brand"
             
         
         Case "Update"
@@ -234,20 +394,21 @@ End Sub
 
 Private Sub NewSingleListing_Click()
 
-    ListingMode = "Single"
-    MultiPage1.Value = MultiPage1.Value + 1
+    ListingMode = "ADP"
+    MultiPage1.value = MultiPage1.value + 1
 
 End Sub
 
 Private Sub SetListing_Click()
 
-    ListingMode = "Set"
+    ListingMode = "Bundle"
+    MultiPage1.value = MultiPage1.value + 1
 
 End Sub
 
 Private Sub ExistingSingleListing_Click()
 
-    ListingMode = "Existing"
+    ListingMode = "Brand"
 
 End Sub
 
@@ -257,63 +418,17 @@ Private Sub UpdateListing_Click()
 
 End Sub
 
-Private Sub MultiPage1_Change()
-
-    'decide when to enable or disable the Previous page button
-    If MultiPage1.Value <= 0 Then
-        Me.PreviousPage.Enabled = False
-    Else
-        Me.PreviousPage.Enabled = True
-    End If
-    
-    'change Next button to List button on the last page
-    If MultiPage1.Value >= PageCount Or MultiPage1.Value = 0 Then   'PageCount is global variable
-        Me.NextPage.Enabled = False
-    Else
-        Me.NextPage.Enabled = True
-    End If
-    
-    'rename userform caption based on page caption
-    ListAmazon.Caption = "List on Amazon (" & MultiPage1.SelectedItem.Caption & ")"
-    
-    'If user is on Part page run PartInfoSub
-    If ListAmazon.Caption Like "*Part*" Then
-        PartInfoSub
-    End If
-    
-    'If user is on Parentage page run
-    If ListAmazon.Caption Like "*Parentage*" Then
-        Me.parent_sku.Value = GenSKU(True)
-    End If
-    
-    'If user is on Review page run ReviewPageSub
-    If ListAmazon.Caption Like "*Review*" Then
-        ReviewPageSub
-    End If
-    
-    'If user is on second page change the caption of the back/cancel button
-    If MultiPage1.Value = 1 Then
-        Me.PreviousPage.Caption = "Start Over"
-    Else
-        Me.PreviousPage.Caption = "Back"
-    End If
-    
-    'check if parentage is selected
-    ParentagePageCheck
-
-End Sub
-
 Private Sub PartInfoSub()
 
-    If ListingMode = "Single" Then
+    If ListingMode = "ADP" Then
         
         'disable Brand becuase it has to be AD Auto Parts and enable Product ID if single
-        Me.brand_name.Value = ""
+        Me.brand_name.value = ""
         Me.brand_name.Enabled = False
         Me.BrandLabel.Enabled = False
         Me.external_product_id.Enabled = True
         
-        Me.update_delete.Value = ""
+        Me.update_delete.value = ""
         
         'Access the Master Database and query the next available GTIN/UPC
         Dim UPC As Recordset
@@ -321,7 +436,7 @@ Private Sub PartInfoSub()
         UPC.MoveFirst
         
         'fill in the next available GTIN as a UPC in external_product_id box
-        Me.external_product_id.Value = Right(UPC.Fields("GTIN").Value, 12)
+        Me.external_product_id.value = Right(UPC.fields("GTIN").value, 12)
         
         UPC.Close
         
@@ -336,7 +451,7 @@ End Sub
 Private Sub ReviewPageSub()
 
     'Generate SKU
-    If Me.part_number.Value <> "" And Me.part_type_id.Value <> "" And Me.Manufacturer.Value <> "" Then
+    If Me.part_number.value <> "" And Me.part_type_id.value <> "" And Me.Manufacturer.value <> "" Then
         'Generate SKU
         GenSKU
         
@@ -344,7 +459,7 @@ Private Sub ReviewPageSub()
         GenDesc
         
         'Generate Title
-        Me.item_name = GenTitle(Me.item_package_quantity.Value, Me.Manufacturer.Value, Me.part_number.Value, Me.part_type_id.Value, "", Me.oem_equivalent_part_number1.Value, "", Me.ParentageCheckBox.Value)
+        Me.item_name = GenTitle(Me.item_package_quantity.value, Me.Manufacturer.value, Me.part_number.value, Me.part_type_id.value, Me.PlugType.value, "", Me.oem_equivalent_part_number1.value, "", Me.ParentageCheckBox.value)
     End If
 
 End Sub
@@ -353,22 +468,22 @@ Private Function GenSKU(Optional parent As Boolean) As String
 
     'Get the Prefix Code from Part Type
     Dim prefix As String
-    Set rst = MstrDb.Execute("SELECT DISTINCT * FROM PartTypes WHERE ACESPartType=" & Chr(34) & Me.part_type_id.Value & Chr(34))
+    Set rst = MstrDb.Execute("SELECT DISTINCT * FROM PartTypes WHERE ACESPartType=" & Chr(34) & Me.part_type_id.value & Chr(34))
     rst.MoveFirst
-    prefix = rst.Fields("PrefixCode").Value
+    prefix = rst.fields("PrefixCode").value
     rst.Close
     
     'Get the Suffix Code from Manufacturer
     Dim suffix As String
-    Set rst = MstrDb.Execute("SELECT DISTINCT * FROM Manufacturers WHERE ManufacturerFull=" & Chr(34) & Me.Manufacturer.Value & Chr(34))
-    suffix = rst.Fields("SuffixCode").Value
+    Set rst = MstrDb.Execute("SELECT DISTINCT * FROM Manufacturers WHERE ManufacturerFull=" & Chr(34) & Me.Manufacturer.value & Chr(34))
+    suffix = rst.fields("SuffixCode").value
     rst.Close
     
     If parent = True Then suffix = suffix & "-P"
     
     'Generate SKU
     GenSKU = prefix & "-" & Me.part_number & "-" & suffix
-    Me.item_sku.Value = GenSKU
+    Me.item_sku.value = GenSKU
 
 End Function
 
@@ -376,14 +491,14 @@ Private Sub GenDesc()
 
     Select Case Me.ParentageCheckBox
         Case False
-            Me.product_description.Value = "This item is designed to be an exact replacement that meets or exceeds original specifications. Please ensure correct part fitment before purchasing this product. Contact the seller directly for additional product information and availability."
+            Me.product_description.value = "This item is designed to be an exact replacement that meets or exceeds original specifications. Please ensure correct part fitment before purchasing this product. Contact the seller directly for additional product information and availability."
         Case True
-            Me.product_description.Value = "This item is designed to be an exact replacement that meets or exceeds original specifications. Please ensure correct part fitment before purchasing this product. Contact the seller directly for additional product information and availability."
+            Me.product_description.value = "This item is designed to be an exact replacement that meets or exceeds original specifications. Please ensure correct part fitment before purchasing this product. Contact the seller directly for additional product information and availability."
     End Select
 
 End Sub
 
-Private Function GenTitle(quantity As String, Manufacturer As String, partNum As String, partType As String, fits As String, equivPart As String, equivBrand As String, isSet As Boolean, Optional SetArr, Optional listingrow As Integer) As String
+Private Function GenTitle(quantity As String, Manufacturer As String, partNum As String, partType As String, PlugType As String, fits As String, equivPart As String, equivBrand As String, isSet As Boolean, Optional SetArr, Optional listingrow As Integer) As String
 
     Dim name As String
     
@@ -391,14 +506,14 @@ Private Function GenTitle(quantity As String, Manufacturer As String, partNum As
     If Me.ParentageCheckBox = False Then
         'non single title
         If quantity > 1 Then
-            name = Manufacturer & " " & partType & " For _ Compatible with _ " & Me.oem_equivalent_part_number1.Value
+            name = Manufacturer & " " & partType & " For _ Compatible with _ " & Me.oem_equivalent_part_number1.value
         Else
             'sets
             If quantity > 1 Then
-                name = "Set of " & quantity & " " & partType & "s For _ Compatible with _ " & Me.oem_equivalent_part_number1.Value
+                name = "Set of " & quantity & " " & partType & "s For _ Compatible with _ " & Me.oem_equivalent_part_number1.value
             Else
                 'single
-                name = partType & " For _ Compatible with _ " & Me.oem_equivalent_part_number1.Value
+                name = partType & " For _ Compatible with _ " & Me.oem_equivalent_part_number1.value
             End If
         End If
     Else
@@ -408,10 +523,10 @@ Private Function GenTitle(quantity As String, Manufacturer As String, partNum As
         If quantity <> "" Then
             'sets
             If quantity > 1 Then
-                name = "Set of " & quantity & " " & partType & "s For _ Compatible with _ " & Me.oem_equivalent_part_number1.Value
+                name = "Set of " & quantity & " " & partType & "s For _ Compatible with _ " & Me.oem_equivalent_part_number1.value
             Else
                 'single
-                name = partType & " For _ Compatible with _ " & Me.oem_equivalent_part_number1.Value
+                name = partType & " For _ Compatible with _ " & Me.oem_equivalent_part_number1.value
             End If
         End If
     End If
@@ -420,9 +535,11 @@ Private Function GenTitle(quantity As String, Manufacturer As String, partNum As
 
 End Function
 
-Private Sub comboBoxes()
+Private Sub ComboBoxes()
 
     FillPartTypes
+    
+    FillPlugTypes
     
     FillManufs
     
@@ -454,7 +571,27 @@ Private Sub FillPartTypes()
     With Me.part_type_id
         .Clear
         Do
-            .AddItem rst.Fields("ACESPartType").Value
+            .AddItem rst.fields("ACESPartType").value
+            rst.MoveNext
+        Loop Until rst.EOF
+    End With
+    
+    rst.Close
+
+End Sub
+
+Private Sub FillPlugTypes()
+
+    Dim rst As Recordset
+    
+    'open Spark Plug Type table in Master Database
+    Set rst = MstrDb.Execute("SELECT * FROM SparkPlugTypes ORDER BY Type")
+    
+    'populate combobox with part types
+    With Me.PlugType
+        .Clear
+        Do
+            .AddItem rst.fields("Type").value
             rst.MoveNext
         Loop Until rst.EOF
     End With
@@ -474,7 +611,7 @@ Private Sub FillManufs()
     With Me.Manufacturer
         .Clear
         Do
-            .AddItem rst.Fields("ManufacturerFull").Value
+            .AddItem rst.fields("ManufacturerFull").value
             rst.MoveNext
         Loop Until rst.EOF
     End With
@@ -494,7 +631,7 @@ Private Sub FillBrands()
     With Me.brand_name
         .Clear
         Do
-            .AddItem rst.Fields("ManufacturerFull").Value
+            .AddItem rst.fields("ManufacturerFull").value
             rst.MoveNext
         Loop Until rst.EOF
     End With
@@ -514,7 +651,7 @@ Private Sub FillOrientations()
     With Me.orientation
         .Clear
         Do
-            .AddItem rst.Fields("Orientation").Value
+            .AddItem rst.fields("Orientation").value
             rst.MoveNext
         Loop Until rst.EOF
     End With
@@ -534,7 +671,7 @@ Private Sub FillFitmentTypes()
     With Me.fit_type
         .Clear
         Do
-            .AddItem rst.Fields("FitmentType").Value
+            .AddItem rst.fields("FitmentType").value
             rst.MoveNext
         Loop Until rst.EOF
     End With
@@ -554,7 +691,7 @@ Private Sub FillConditions()
     With Me.condition_type
         .Clear
         Do
-            .AddItem rst.Fields("Condition").Value
+            .AddItem rst.fields("Condition").value
             rst.MoveNext
         Loop Until rst.EOF
     End With
@@ -574,7 +711,7 @@ Private Sub FillShippingTemplates()
     With Me.merchant_shipping_group_name
         .Clear
         Do
-            .AddItem rst.Fields("Shipping Template").Value
+            .AddItem rst.fields("Shipping Template").value
             rst.MoveNext
         Loop Until rst.EOF
     End With
@@ -594,7 +731,7 @@ Private Sub FillUpdateDelete()
     With Me.update_delete
         .Clear
         Do
-            .AddItem rst.Fields("Update/Delete").Value
+            .AddItem rst.fields("Update/Delete").value
             rst.MoveNext
         Loop Until rst.EOF
     End With
@@ -614,7 +751,7 @@ Private Sub FillWeightUnits()
     With Me.website_shipping_weight_unit_of_measure
         .Clear
         Do
-            .AddItem rst.Fields("WeightUnit").Value
+            .AddItem rst.fields("WeightUnit").value
             rst.MoveNext
         Loop Until rst.EOF
     End With
@@ -630,9 +767,9 @@ Private Sub NextPage_Click()
     
     If Incomplete = False Then
         'move to next page
-        MultiPage1.Value = MultiPage1.Value + 1     'automatically skips disabled pages
+        MultiPage1.value = MultiPage1.value + 1     'automatically skips disabled pages
     Else
-        MsgBox "Please fill out required fields."
+        MsgBox ("Please fill out required fields.")
     End If
 
 End Sub
@@ -642,20 +779,20 @@ Private Sub PreviousPage_Click()
     Dim ctr As control
     
     'if user goes back to the first page, clear all values, user chose to cancel listing
-    If MultiPage1.Value = 1 Then
+    If MultiPage1.value = 1 Then
         For Each ctr In Me.Controls
             If TypeName(ctr) = "ComboBox" Or TypeName(ctr) = "TextBox" Then
-                ctr.Value = ""
+                ctr.value = ""
             End If
         Next ctr
     End If
     
     'check to see if any pages are disabled so that the back button works properly to skip them
-    If MultiPage1.Pages(MultiPage1.Value - 1).Visible = False Then
-        MultiPage1.Value = MultiPage1.Value - 2     'need to go back 2 if page disabled
+    If MultiPage1.Pages(MultiPage1.value - 1).Visible = False Then
+        MultiPage1.value = MultiPage1.value - 2     'need to go back 2 if page disabled
     Else
         'otherwise go back 1
-        MultiPage1.Value = MultiPage1.Value - 1
+        MultiPage1.value = MultiPage1.value - 1
     End If
 
 End Sub
@@ -675,9 +812,9 @@ Private Sub RequiredFields()
             'only focus on label controls
             If TypeName(cCont) = "Label" Then
                 'if the field name is found in the label in the userform
-                If InStr(1, cCont.Caption, rst.Fields("Label_Name").Value) > 0 Then
+                If InStr(1, cCont.Caption, rst.fields("Label_Name").value) > 0 Then
                     'if the field and the label are equal
-                    If cCont.Caption = rst.Fields("Label_Name").Value Then
+                    If cCont.Caption = rst.fields("Label_Name").value Then
                         'add asterisk to the end to denote required field
                         cCont.Caption = cCont.Caption & "*"
                     End If
@@ -703,7 +840,7 @@ Private Sub CheckEmptyRequiredFields()
     Dim currentControl As String
     
     'use current page in multi page
-    currentPage = Me.MultiPage1.Value
+    currentPage = Me.MultiPage1.value
     
     'start by assuming all fields are filled
     Incomplete = False
@@ -715,13 +852,13 @@ Private Sub CheckEmptyRequiredFields()
         If Not TypeName(cCont) = "Label" And Not TypeName(cCont) = "MultiPage" And Not TypeName(cCont) = "CommandButton" And Not TypeName(cCont) = "CheckBox" And Not TypeName(cCont) = "Nothing" Then
             rst.MoveFirst
             Do While Not rst.EOF
-                If LCase(cCont.name) = LCase(rst.Fields("Field_Name").Value) Then
+                If LCase(cCont.name) = LCase(rst.fields("Field_Name").value) Then
                     If cCont.Enabled = True Then
                         If cCont = "" Then
                             For Each savedCont In Me.MultiPage1.Pages(currentPage).Controls
                                 If TypeName(savedCont) = "Label" Then
                                     If ListingMode = "Single" Then
-                                        If Left(savedCont.Caption, Len(savedCont.Caption) - 1) = rst.Fields("Label_Name").Value And savedCont.Caption <> "Brand Name" Then
+                                        If left(savedCont.Caption, Len(savedCont.Caption) - 1) = rst.fields("Label_Name").value And savedCont.Caption <> "Brand Name" Then
                                             'if any field is not filled, return incomplete
                                             Incomplete = True
                                             savedCont.ForeColor = RGB(255, 0, 0)
@@ -816,7 +953,7 @@ Private Sub ListSingle(listingrow As Integer, lastcolumnletter As String, isSet 
         Call EnterWeight(lastcolumnletter, listingrow, SetArr, i)
         
         'package quantity
-        If AmazonColumn(lastcolumnletter, "item_package_quantity") > 0 Then Cells(listingrow, AmazonColumn(lastcolumnletter, "item_package_quantity")).Value = Replace(SetArr(i), "Setof", "")
+        If AmazonColumn(lastcolumnletter, "item_package_quantity") > 0 Then Cells(listingrow, AmazonColumn(lastcolumnletter, "item_package_quantity")).value = Replace(SetArr(i), "Setof", "")
         
         'Size Name
         Call EnterSizeName(lastcolumnletter, listingrow, SetArr, i)
@@ -824,21 +961,21 @@ Private Sub ListSingle(listingrow As Integer, lastcolumnletter As String, isSet 
         'overwrite part number
         If AmazonColumn(lastcolumnletter, "part_number") > 0 Then
             If SetArr(i) = "Setof1" Then
-                Cells(listingrow, AmazonColumn(lastcolumnletter, "part_number")).Value = Me.part_number.Value
+                Cells(listingrow, AmazonColumn(lastcolumnletter, "part_number")).value = Me.part_number.value
             Else
-                Cells(listingrow, AmazonColumn(lastcolumnletter, "part_number")).Value = Me.part_number.Value & "-" & _
+                Cells(listingrow, AmazonColumn(lastcolumnletter, "part_number")).value = Me.part_number.value & "-" & _
                 Replace(SetArr(i), "Setof", "")
             End If
         End If
         
         'parentage
-        If AmazonColumn(lastcolumnletter, "parent_child") > 0 Then Cells(listingrow, AmazonColumn(lastcolumnletter, "parent_child")).Value = "child"
+        If AmazonColumn(lastcolumnletter, "parent_child") > 0 Then Cells(listingrow, AmazonColumn(lastcolumnletter, "parent_child")).value = "child"
         
         'relationship type
-        If AmazonColumn(lastcolumnletter, "relationship_type") > 0 Then Cells(listingrow, AmazonColumn(lastcolumnletter, "relationship_type")).Value = "Variation"
+        If AmazonColumn(lastcolumnletter, "relationship_type") > 0 Then Cells(listingrow, AmazonColumn(lastcolumnletter, "relationship_type")).value = "Variation"
         
         'variation theme
-        If AmazonColumn(lastcolumnletter, "variation_theme") > 0 Then Cells(listingrow, AmazonColumn(lastcolumnletter, "variation_theme")).Value = "sizeName"
+        If AmazonColumn(lastcolumnletter, "variation_theme") > 0 Then Cells(listingrow, AmazonColumn(lastcolumnletter, "variation_theme")).value = "sizeName"
         
         'title
         Call EnterTitle(lastcolumnletter, listingrow, SetArr, i)
@@ -895,44 +1032,56 @@ Private Sub ListParent(lastcolumnletter As String, listingrow As Integer)
     
     'look for SKU field and populate it with parent SKU user provided
     foundcolumn = AmazonColumn(lastcolumnletter, "item_sku")
-    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = Me.parent_sku.Value
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).value = Me.parent_sku.value
     
     'populate brand
     Call EnterBrand(lastcolumnletter, listingrow)
     
     'look for title field and populate it with autogenerated title
     foundcolumn = AmazonColumn(lastcolumnletter, "item_name")
-    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "Parent title"
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).value = "Parent title"
     
     'look for manufacturer field and populate it with manufacturer user provided
     foundcolumn = AmazonColumn(lastcolumnletter, "manufacturer")
-    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = Me.Manufacturer.Value
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).value = Me.Manufacturer.value
     
     'look for part number field and populate it with autogenerated part number
     foundcolumn = AmazonColumn(lastcolumnletter, "part_number")
-    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = Me.part_number & "-P"
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).value = Me.part_number & "-P"
     
     'look for product type field and populate it with "autopart"
     Call EnterFeedProductType(lastcolumnletter, listingrow)
     
     'look for part type field and populate it with part type user provided
     foundcolumn = AmazonColumn(lastcolumnletter, "part_type_id")
-    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = Me.part_type_id.Value
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).value = Me.part_type_id.value
     
     'look for item type field and populate it with item type
     Call EnterItemType(lastcolumnletter, listingrow)
     
     'look for condition field and populate it with condition user provided
     foundcolumn = AmazonColumn(lastcolumnletter, "condition_type")
-    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = Me.condition_type.Value
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).value = Me.condition_type.value
     
     'look for parentage field and populate it with "parent"
     foundcolumn = AmazonColumn(lastcolumnletter, "parent_child")
-    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "parent"
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).value = "parent"
     
     'look for variation theme field and populate it with "SizeName"
     foundcolumn = AmazonColumn(lastcolumnletter, "variation_theme")
-    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "SizeName"
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).value = "SizeName"
+
+End Sub
+
+Private Sub ListBundle(lastcolumnletter As String, listingrow As Integer, Optional SetArr)
+
+    ListAmazon.Show
+
+End Sub
+
+Private Sub ListBrand(lastcolumnletter As String, listingrow As Integer, Optional SetArr)
+
+    
 
 End Sub
 
@@ -969,7 +1118,7 @@ Private Sub EnterControls(lastcolumnletter As String, listingrow As Integer, Opt
             'if field name is not found, FoundColumn will return 0, and can't have a 0th column
             'add exception to external_product_id because it needs to be pulled from Master Database
             'add exception to manufacturer because it usually needs to be overridden
-            If foundcolumn > 0 And cCont.name <> "external_product_id" And cCont.name <> "manufacturer" Then Cells(listingrow, foundcolumn).Value = cCont.Value
+            If foundcolumn > 0 And cCont.name <> "external_product_id" And cCont.name <> "manufacturer" Then Cells(listingrow, foundcolumn).value = cCont.value
         End If
     Next cCont
 
@@ -983,12 +1132,12 @@ Private Sub EnterSKU(lastcolumnletter As String, listingrow As Integer, isSet As
     'add set size to end of sku
     If isSet = True Then
         If SetArr(i) = "Setof1" Then
-            Cells(listingrow, foundcolumn).Value = Me.item_sku.Value
+            Cells(listingrow, foundcolumn).value = Me.item_sku.value
         Else
-            Cells(listingrow, foundcolumn).Value = Me.item_sku.Value & "-" & Replace(SetArr(i), "Setof", "")
+            Cells(listingrow, foundcolumn).value = Me.item_sku.value & "-" & Replace(SetArr(i), "Setof", "")
         End If
     Else
-        Cells(listingrow, foundcolumn).Value = Me.item_sku.Value
+        Cells(listingrow, foundcolumn).value = Me.item_sku.value
     End If
 
 End Sub
@@ -999,7 +1148,7 @@ Private Sub EnterProductIDType(lastcolumnletter As String, listingrow As Integer
     
     foundcolumn = AmazonColumn(lastcolumnletter, "external_product_id_type")
     
-    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "UPC"
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).value = "UPC"
 
 End Sub
 
@@ -1019,25 +1168,27 @@ Private Sub EnterProductID(lastcolumnletter As String, listingrow As Integer)
     ProductID.MoveFirst
     
     'save GTIN to variable
-    GTIN = ProductID.Fields("GTIN").Value
+    GTIN = ProductID.fields("GTIN").value
     ProductID.Close
     
     'remove the first towo digits from the GTIN to get UPC
-    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = Right(GTIN, 12)
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).value = Right(GTIN, 12)
     
     'find the column where SKU is located
     foundcolumn = AmazonColumn(lastcolumnletter, "item_sku")
-    If foundcolumn > 0 Then setSKU = Cells(listingrow, foundcolumn).Value
+    If foundcolumn > 0 Then setSKU = Cells(listingrow, foundcolumn).value
     
     'find the user
     Dim User As String
     'grab user from ComputerUsersTable based on current computer being used
     Set ProductID = MstrDb.Execute("SELECT UserName FROM ComputerUsersTable WHERE ComputerName = " & Chr(34) & Environ$("computername") & Chr(34))
-    User = ProductID.Fields("UserName")
+    User = ProductID.fields("UserName")
     ProductID.Close
     
-    'update the GTINs table to reserve UPCs
-'    Set rst = MstrDb.Execute("UPDATE [GTINs] Set GTINs.SKU = " & Chr(34) & setSKU & Chr(34) & ", GTINs.User = " & Chr(34) & User & Chr(34) & ", GTINs.DateReserved = Now WHERE GTINs.GTIN = " & Chr(34) & GTIN & Chr(34))
+    'update the GTINs table to reserve UPCs if not in debugging mode
+    If DebugMode = False Then
+        Set rst = MstrDb.Execute("UPDATE [GTINs] Set GTINs.SKU = " & Chr(34) & setSKU & Chr(34) & ", GTINs.User = " & Chr(34) & User & Chr(34) & ", GTINs.DateReserved = Now WHERE GTINs.GTIN = " & Chr(34) & GTIN & Chr(34))
+    End If
     
 End Sub
 
@@ -1047,7 +1198,7 @@ Private Sub EnterFeedProductType(lastcolumnletter As String, listingrow As Integ
     
     foundcolumn = AmazonColumn(lastcolumnletter, "feed_product_type")
     
-    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "autopart"
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).value = "autopart"
 
 End Sub
 
@@ -1056,13 +1207,13 @@ Private Sub EnterItemType(lastcolumnletter As String, listingrow As Integer)
     Dim foundcolumn As Integer
     
     'lookup the BTG value of the part type
-    Set rst = MstrDb.Execute("SELECT BTGValue FROM AAIAPartTypes WHERE AAIAPartType=" & Chr(34) & Me.part_type_id.Value & Chr(34))
+    Set rst = MstrDb.Execute("SELECT BTGValue FROM AAIAPartTypes WHERE AAIAPartType=" & Chr(34) & Me.part_type_id.value & Chr(34))
     rst.MoveFirst
     
     'find the column in the excel sheet with "item_type" in the second row to enter the BTG value
     foundcolumn = AmazonColumn(lastcolumnletter, "item_type")
     
-    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = rst.Fields("BTGValue").Value
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).value = rst.fields("BTGValue").value
     
     'close the query
     rst.Close
@@ -1076,10 +1227,11 @@ Private Sub EnterTitle(lastcolumnletter As String, listingrow As Integer, SetArr
     foundcolumn = AmazonColumn(lastcolumnletter, "item_name")
     
     If foundcolumn > 0 Then
-        If Me.ParentageCheckBox.Value = True Then
-            Cells(listingrow, foundcolumn).Value = GenTitle(Me.item_package_quantity.Value, Me.Manufacturer.Value, Me.part_number.Value, Me.part_type_id.Value, "", Me.oem_equivalent_part_number1.Value, "", Me.ParentageCheckBox.Value, SetArr, i)
+        If Me.ParentageCheckBox.value = True Then
+            'Cells(listingrow, foundcolumn).Value = GenTitle(Me.item_package_quantity.Value, Me.Manufacturer.Value, Me.part_number.Value, Me.part_type_id.Value, "", Me.oem_equivalent_part_number1.Value, "", Me.ParentageCheckBox.Value, SetArr, i)
+            Cells(listingrow, foundcolumn).value = GenTitle(Me.item_package_quantity.value, Me.Manufacturer.value, Me.part_number.value, Me.part_type_id.value, Me.PlugType.value, "", Me.oem_equivalent_part_number1.value, "", Me.ParentageCheckBox, SetArr, i)
         Else
-            Cells(listingrow, foundcolumn).Value = GenTitle(Me.item_package_quantity.Value, Me.Manufacturer.Value, Me.part_number.Value, Me.part_type_id.Value, "", Me.oem_equivalent_part_number1.Value, "", Me.ParentageCheckBox.Value)
+            Cells(listingrow, foundcolumn).value = GenTitle(Me.item_package_quantity.value, Me.Manufacturer.value, Me.part_number.value, Me.part_type_id.value, Me.PlugType.value, "", Me.oem_equivalent_part_number1.value, "", Me.ParentageCheckBox, SetArr, i)
         End If
     End If
 
@@ -1090,14 +1242,19 @@ Private Sub EnterBrand(lastcolumnletter As String, listingrow As Integer)
     Dim foundcolumn As Integer
     
     'brand
-    If ListingMode = "Single" Then
-        foundcolumn = AmazonColumn(lastcolumnletter, "brand_name")
-        
-        If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "AD Auto Parts"
-    Else
-        'to be determined
-        
-    End If
+    Select Case ListingMode
+        Case "Single", "ADP"
+            foundcolumn = AmazonColumn(lastcolumnletter, "brand_name")
+            
+            If foundcolumn > 0 Then Cells(listingrow, foundcolumn).value = "AD Auto Parts"
+            
+        Case "Brand"
+            
+            
+        Case "Update"
+            
+            
+    End Select
 
 End Sub
 
@@ -1109,7 +1266,7 @@ Private Sub EnterManufacturer(lastcolumnletter As String, listingrow As Integer)
     If ListingMode = "Single" Then
         foundcolumn = AmazonColumn(lastcolumnletter, "brand_name")
         
-        If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "AD Auto Parts"
+        If foundcolumn > 0 Then Cells(listingrow, foundcolumn).value = "AD Auto Parts"
     Else
         'to be determined
         
@@ -1123,9 +1280,9 @@ Private Sub EnterPrice(lastcolumnletter As String, listingrow As Integer, isSet 
     foundcolumn = AmazonColumn(lastcolumnletter, "standard_price")
     
     If isSet = True Then
-        Cells(listingrow, foundcolumn).Value = Replace(SetArr(i), "Setof", "") * Me.standard_price.Value
+        Cells(listingrow, foundcolumn).value = Replace(SetArr(i), "Setof", "") * Me.standard_price.value
     Else
-        Cells(listingrow, foundcolumn).Value = Me.standard_price.Value
+        Cells(listingrow, foundcolumn).value = Me.standard_price.value
     End If
 
 End Sub
@@ -1140,9 +1297,9 @@ Private Sub EnterPackageQauntity(lastcolumnletter As String, listingrow As Integ
         'if SetListing is True, then user is listing sets. Calculate package quantity differently
         If SetListing = True Then
             'find out how to multiply this to find the number of items
-            Cells(listingrow, foundcolumn).Value = Replace(SetArr(i), "Setof", "")
+            Cells(listingrow, foundcolumn).value = Replace(SetArr(i), "Setof", "")
         Else
-            Cells(listingrow, foundcolumn).Value = Me.item_package_quantity
+            Cells(listingrow, foundcolumn).value = Me.item_package_quantity
         End If
     Else
         'placeholder
@@ -1160,7 +1317,7 @@ Private Sub EnterShippingTemplate(lastcolumnletter As String, listingrow As Inte
     shiptempcol = AmazonColumn(lastcolumnletter, "merchant_shipping_group_name")
     
     'Enter the shipping template the user chose
-    Cells(listingrow, shiptempcol).Value = Me.merchant_shipping_group_name.Value
+    Cells(listingrow, shiptempcol).value = Me.merchant_shipping_group_name.value
     
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 'Code not needed anymore because it's impossible to predict what shipping template needs to be used
@@ -1235,7 +1392,7 @@ Private Sub EnterDiscontinued(lastcolumnletter As String, listingrow As Integer)
         
     'if field was found and the user left is_discontinued_by_manufacturer checkbox blank then change to null
     If Me.is_discontinued_by_manufacturer = False Then
-        If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = ""
+        If foundcolumn > 0 Then Cells(listingrow, foundcolumn).value = ""
     End If
 
 End Sub
@@ -1249,10 +1406,10 @@ Private Sub EnterNumberofItems(lastcolumnletter As String, listingrow As Integer
     'if SetListing is True, then user is listing sets. Calculate number of items differently
     If SetListing = True Then
         'find out how to multiply this to find the number of items
-        Cells(listingrow, foundcolumn).Value = Replace(SetArr(i), "Setof", "") 'find column letter first
+        Cells(listingrow, foundcolumn).value = Replace(SetArr(i), "Setof", "") 'find column letter first
     Else
         foundcolumn = AmazonColumn(lastcolumnletter, "number_of_items")
-        If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = Me.item_package_quantity
+        If foundcolumn > 0 Then Cells(listingrow, foundcolumn).value = Me.item_package_quantity
     End If
 
 End Sub
@@ -1263,7 +1420,7 @@ Private Sub EnterQuantity(lastcolumnletter As String, listingrow As Integer)
     
     foundcolumn = AmazonColumn(lastcolumnletter, "quantity")
         
-    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = 1    'Finale takes care of quantity listed
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).value = 1    'Finale takes care of quantity listed
 
 End Sub
 
@@ -1273,7 +1430,7 @@ Private Sub EnterTaxCode(lastcolumnletter As String, listingrow As Integer)
     
     foundcolumn = AmazonColumn(lastcolumnletter, "product_tax_code")
         
-    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "A_GEN_TAX"
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).value = "A_GEN_TAX"
 
 End Sub
 
@@ -1283,14 +1440,14 @@ Private Sub EnterHandlingTime(lastcolumnletter As String, listingrow As Integer)
     
     foundcolumn = AmazonColumn(lastcolumnletter, "fulfillment_latency")
         
-    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = 1   'should always be 1 to meet Amazon's standards
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).value = 1   'should always be 1 to meet Amazon's standards
 
 End Sub
 
 Private Sub KeyProductFeatures(lastcolumnletter As String, listingrow As Integer)
 
     Dim i As Integer
-    Set rst = MstrDb.Execute("SELECT * FROM KeyProductFeatures WHERE ([Manufacturer]=" & Chr(34) & Me.Manufacturer.Value & Chr(34) & " AND [PartType]=" & Chr(34) & Me.part_type_id.Value & Chr(34) & ")")
+    Set rst = MstrDb.Execute("SELECT * FROM KeyProductFeatures WHERE ([Manufacturer]=" & Chr(34) & Me.Manufacturer.value & Chr(34) & " AND [PartType]=" & Chr(34) & Me.part_type_id.value & Chr(34) & ")")
     rst.MoveFirst
     
     Dim KPFColumn As Integer
@@ -1298,7 +1455,7 @@ Private Sub KeyProductFeatures(lastcolumnletter As String, listingrow As Integer
     KPFColumn = AmazonColumn(lastcolumnletter, "bullet_point1")
     
     For i = KPFColumn To KPFColumn + 4
-        Cells(listingrow, i).Value = rst.Fields("KeyProductFeature" & i).Value
+        Cells(listingrow, i).value = rst.fields("KeyProductFeature" & i).value
     Next i
 
 End Sub
@@ -1317,8 +1474,8 @@ Private Sub EnterDimensionsUnitOfMeasure(lastcolumnletter As String, listingrow 
     MeasureColumn = AmazonColumn(lastcolumnletter, "item_dimensions_unit_of_measure")
     
     'If any item dimension is not null, the enter IN into the unit of measure field
-    If Cells(listingrow, LengthColumn).Value <> "" Or Cells(listingrow, HeightColumn).Value <> "" Or Cells(listingrow, WidthColumn).Value <> "" Then
-        Cells(listingrow, MeasureColumn).Value = "IN"
+    If Cells(listingrow, LengthColumn).value <> "" Or Cells(listingrow, HeightColumn).value <> "" Or Cells(listingrow, WidthColumn).value <> "" Then
+        Cells(listingrow, MeasureColumn).value = "IN"
     End If
 
 End Sub
@@ -1332,12 +1489,12 @@ Private Sub EnterWeight(lastcolumnletter As String, listingrow As Integer, SetAr
     Dim WeightLb As Double
     
     'find weight of a single
-    If Me.website_shipping_weight_unit_of_measure.Value = "LB" Then
-        WeightOz = Me.website_shipping_weight.Value * 16
-        WeightLb = Me.website_shipping_weight.Value
+    If Me.website_shipping_weight_unit_of_measure.value = "LB" Then
+        WeightOz = Me.website_shipping_weight.value * 16
+        WeightLb = Me.website_shipping_weight.value
     Else
-        WeightOz = Me.website_shipping_weight.Value
-        WeightLb = Me.website_shipping_weight.Value / 16
+        WeightOz = Me.website_shipping_weight.value
+        WeightLb = Me.website_shipping_weight.value / 16
     End If
     
     'enter the value
@@ -1350,12 +1507,12 @@ Private Sub EnterWeight(lastcolumnletter As String, listingrow As Integer, SetAr
     If weightfield > 0 Then
         If WeightLb * SetSize >= 1 Then
             'if weight is over a pound, use LB
-            Cells(listingrow, weightfield).Value = Round(WeightLb * SetSize, 2)
-            Cells(listingrow, unitfield).Value = "LB"
+            Cells(listingrow, weightfield).value = Round(WeightLb * SetSize, 2)
+            Cells(listingrow, unitfield).value = "LB"
         Else
             'if weight is under a pound, use OZ
-            Cells(listingrow, weightfield).Value = Round(WeightOz * SetSize, 2)
-            Cells(listingrow, unitfield).Value = "OZ"
+            Cells(listingrow, weightfield).value = Round(WeightOz * SetSize, 2)
+            Cells(listingrow, unitfield).value = "OZ"
         End If
     End If
 
@@ -1367,7 +1524,7 @@ Private Sub EnterProp65(lastcolumnletter As String, listingrow As Integer)
     
     foundcolumn = AmazonColumn(lastcolumnletter, "california_proposition_65_compliance_type")
         
-    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "Passenger or Off Road Vehicle"   'All our items are for Passenger or Off Road Vehicle
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).value = "Passenger or Off Road Vehicle"   'All our items are for Passenger or Off Road Vehicle
 
 End Sub
 
@@ -1377,11 +1534,11 @@ Private Sub EnterWarranty(lastcolumnletter As String, listingrow As Integer)
     
     'enter the warranty type
     foundcolumn = AmazonColumn(lastcolumnletter, "mfg_warranty_description_type")
-    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "Parts"
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).value = "Parts"
     
     'enter the warranty description
     foundcolumn = AmazonColumn(lastcolumnletter, "warranty_description")
-    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = "Manufacturer warranty for 180 days from date of purchase, covers exchange of defective part while supplies last or a prorated return of defective part."
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).value = "Manufacturer warranty for 180 days from date of purchase, covers exchange of defective part while supplies last or a prorated return of defective part."
 
 End Sub
 
@@ -1390,13 +1547,13 @@ Private Sub EnterSizeName(lastcolumnletter As String, listingrow As Integer, Set
     Dim foundcolumn As Integer
     foundcolumn = AmazonColumn(lastcolumnletter, "size_name")
         
-    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).Value = Replace(SetArr(i), "Setof", "Set of ")
+    If foundcolumn > 0 Then Cells(listingrow, foundcolumn).value = Replace(SetArr(i), "Setof", "Set of ")
 
 End Sub
 
 Private Sub website_shipping_weight_Change()
 
-    If IsNumeric(Me.website_shipping_weight.Value) = False Then
+    If IsNumeric(Me.website_shipping_weight.value) = False Then
         Me.ShippingWeightLabel.ForeColor = RGB(255, 0, 0)
     End If
 

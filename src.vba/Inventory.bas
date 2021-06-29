@@ -6,7 +6,7 @@ Public Sub FormatReportMain()
     Application.ScreenUpdating = False
     
     'shift rows up to align with Product ID
-    Range("B2:F2").Delete Shift:=xlUp
+    range("B2:F2").Delete Shift:=xlUp
     
     'Remove blank rows
     CleanStock
@@ -22,7 +22,7 @@ Public Sub FormatReportMain()
     columns("A:A").Insert Shift:=xlToRight
     
     'Create Count Column
-    Range("A1").Value = "Count"
+    range("A1").value = "Count"
     
     'recount rows
     numrows = CountRows("A:A")
@@ -31,13 +31,13 @@ Public Sub FormatReportMain()
     Call Borders(numrows)
     
     'Add Filters
-    Range("A:F").AutoFilter
+    range("A:F").AutoFilter
     
     'AutoFit
     columns("A:G").EntireColumn.AutoFit
     
     'Select Cell A2
-    Range("A2").Select
+    range("A2").Select
     
     'Turn screen updating on
     Application.ScreenUpdating = True
@@ -56,7 +56,7 @@ End Sub
 
 Private Sub Borders(numrows As Integer)
 
-    Range("A1:F" & numrows).Select
+    range("A1:F" & numrows).Select
     Selection.Borders(xlDiagonalDown).LineStyle = xlNone
     Selection.Borders(xlDiagonalUp).LineStyle = xlNone
     With Selection.Borders(xlEdgeLeft)
@@ -120,8 +120,8 @@ Public Sub ConfirmInvMain()
     numrows = CountRows("A:A")
     
     'Save range in ADP Excel Sheet to variable
-    Dim ADPRange As Range
-    Set ADPRange = Range("A2:A" & numrows)
+    Dim ADPRange As range
+    Set ADPRange = range("A2:A" & numrows)
     
     'Open the Confirmed Inventory workbook on the Server
     'Screenupdating is off so this opening of the workbook will not be visible
@@ -132,11 +132,11 @@ Public Sub ConfirmInvMain()
     
     'count the number of rows in the Confirmed Inventory workbook
     Dim k As Integer
-    k = Application.WorksheetFunction.CountA(Sht.Range("A:A")) + 1
+    k = Application.WorksheetFunction.CountA(Sht.range("A:A")) + 1
     
     'Save the first empty cell in the Confirmed Inventory workbook to variable
-    Dim ConfirmedRange As Range
-    Set ConfirmedRange = Sht.Range("A" & k)
+    Dim ConfirmedRange As range
+    Set ConfirmedRange = Sht.range("A" & k)
     
     'Copy the values from ADP Excel Sheet and paste in the Confirmed Inventory workbook
     ADPRange.Copy Destination:=ConfirmedRange
@@ -145,7 +145,7 @@ Public Sub ConfirmInvMain()
     Confirmed.Close savechanges:=True
     
     'Select cell A1
-    Range("A1").Select
+    range("A1").Select
     
     'Turn screen updating on
     Application.ScreenUpdating = True
@@ -155,27 +155,27 @@ End Sub
 Private Sub ConfirmedInventory(numrows)
 
     'Create Confirmed Inventory Column
-    Range("G1").Value = "Done"
+    range("G1").value = "Done"
     
     'Do Vlookup in G1
-    Range("G2").FormulaR1C1 = _
+    range("G2").FormulaR1C1 = _
         "=VLOOKUP(RC[-6],'\\ADP-SERVER\AD AutoParts Server (Temp)\Inventory\[Confirmed Inventory.xlsx]Sheet1'!Confirmed,1,FALSE)"
     
     'autofill formula
-    Range("G2").AutoFill Destination:=Range("G2:G" & numrows), Type:=xlFillDefault
+    range("G2").AutoFill Destination:=range("G2:G" & numrows), Type:=xlFillDefault
     
     'convert formulas to values
-    Range("G1:G" & numrows).Cells.Copy
-    Range("G1").Cells.PasteSpecial xlPasteValues
+    range("G1:G" & numrows).Cells.Copy
+    range("G1").Cells.PasteSpecial xlPasteValues
     
     'Delete confirmed inventory rows
     Dim i As Integer
     For i = 2 To numrows
         
-        If Not IsError(Range("G" & i).Value) Then
+        If Not IsError(range("G" & i).value) Then
             Rows(i).Delete
-            If Not IsError(Range("G" & i)) Then
-                If Range("G" & i).Value = "" Then
+            If Not IsError(range("G" & i)) Then
+                If range("G" & i).value = "" Then
                     i = numrows
                 End If
             Else
@@ -202,9 +202,9 @@ Public Sub RemoveInactiveMain()
     Application.ScreenUpdating = False
     
     'run through every row until empty
-    Do While Cells(i, 2).Value <> ""
+    Do While Cells(i, 2).value <> ""
         'delete row if value in B is "Inactive"
-        If Cells(i, 2).Value = "Inactive" Then
+        If Cells(i, 2).value = "Inactive" Then
             Cells(i, 2).EntireRow.Delete
         Else
             'Move to next row
@@ -219,4 +219,3 @@ Public Sub RemoveInactiveMain()
     RibbonCategories
 
 End Sub
-

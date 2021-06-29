@@ -31,8 +31,8 @@ Private Sub InitialCleanup()
     numEntries = CountRows("A:A")
     
     If numrows <> numEntries Then
-        Do Until Application.CountA(Range("A" & numEntries + 1).EntireRow) = 0
-            Range("A" & numEntries + 1).EntireRow.Delete
+        Do Until Application.CountA(range("A" & numEntries + 1).EntireRow) = 0
+            range("A" & numEntries + 1).EntireRow.Delete
         Loop
     End If
 
@@ -47,17 +47,17 @@ Private Sub HerkoDropshipMain()
     numrows = CountRows("A:A")
     
     'clear the tax column, will replace with shipping cost from Shipstation
-    Range("H:H").Clear
+    range("H:H").Clear
     
     'rename Headers
-    Range("H1").Value = "Shipping Cost"
-    Range("I1").Value = "AD Total Price"
-    Range("J1").Value = "Selling Price"
-    Range("K1").Value = "Profit/Loss"
+    range("H1").value = "Shipping Cost"
+    range("I1").value = "AD Total Price"
+    range("J1").value = "Selling Price"
+    range("K1").value = "Profit/Loss"
     
     'Fill in formulas
-    Range("I2:I" & numrows).Formula = "=G2+H2"
-    Range("K2:K" & numrows).Formula = "=(J2*88%)-I2"
+    range("I2:I" & numrows).Formula = "=G2+H2"
+    range("K2:K" & numrows).Formula = "=(J2*88%)-I2"
     
     'pretty it up
     Call HerkoFinalFormat(numrows)
@@ -75,17 +75,17 @@ Private Sub HerkoFinalFormat(numrows As Integer)
     FreezeTopRow
     
     'format date and currency columns
-    Range("A:A").NumberFormat = "m/d/yy"
-    Range("F:K").NumberFormat = "$#,##0.00"
+    range("A:A").NumberFormat = "m/d/yy"
+    range("F:K").NumberFormat = "$#,##0.00"
     
     'Conditional Formatting Profit column
     Conditionals
     
     'autofit/filter columns
-    Range("A:K").AutoFilter
-    Range("A:K").EntireColumn.AutoFit
+    range("A:L").AutoFilter
+    range("A:M").EntireColumn.AutoFit
     
-    Range("A1").Select
+    range("A1").Select
 
 End Sub
 
@@ -102,13 +102,13 @@ End Sub
 Private Sub Conditionals()
 
     'variables
-    Dim profitcol As Range
-    Dim custcol As Range
+    Dim profitcol As range
+    Dim custcol As range
     Dim uv As UniqueValues
     Dim cond As FormatCondition
     
     'define range
-    Set profitcol = Range("K2", Range("K2").End(xlDown))
+    Set profitcol = range("K2", range("K2").End(xlDown))
     
     'delete any existing conditional formatting
     profitcol.FormatConditions.Delete
@@ -123,7 +123,7 @@ Private Sub Conditionals()
     End With
     
     'apply conditional formatting to find duplicate customers
-    Set custcol = Range("B2", Range("B2").End(xlDown))
+    Set custcol = range("B2", range("B2").End(xlDown))
     
     Set uv = custcol.FormatConditions.AddUniqueValues
     uv.DupeUnique = xlDuplicate
@@ -154,19 +154,19 @@ Private Sub ShipstationFinalFormat(numrows As Integer)
 
     FreezeTopRow
     
-    Range("A:A").NumberFormat = "mm/dd/yyyy"
-    Range("D:E").NumberFormat = "$#,##0.00"
+    range("A:A").NumberFormat = "mm/dd/yyyy"
+    range("D:E").NumberFormat = "$#,##0.00"
     
-    Range("A:E").EntireColumn.AutoFit
+    range("A:M").EntireColumn.AutoFit
     
     Call RenameSheet("Shipstation", numrows)
     
-    Range("A1").Value = "Shipped Date"
-    Range("C1").Value = "Ship To"
-    Range("D1").Value = "Order Total"
-    Range("E1").Value = "Shipping Cost"
+    range("A1").value = "Shipped Date"
+    range("C1").value = "Ship To"
+    range("D1").value = "Order Total"
+    range("E1").value = "Shipping Cost"
     
-    Range("A1").Select
+    range("A1").Select
 
 End Sub
 
@@ -177,13 +177,13 @@ Private Sub RenameSheet(Source As String, numrows As Integer)
     Dim yearStart As String
     Dim yearEnd As String
     
-    yearStart = Left(Range("A2"), Len(Range("A2")) - 4) & Right(Range("A2"), 2)
-    yearEnd = Left(Range("A" & numrows), Len(Range("A" & numrows)) - 4) & Right(Range("A" & numrows), 2)
+    yearStart = left(range("A2"), Len(range("A2")) - 4) & Right(range("A2"), 2)
+    yearEnd = left(range("A" & numrows), Len(range("A" & numrows)) - 4) & Right(range("A" & numrows), 2)
     
     If yearStart = yearEnd Then
         ActiveSheet.name = Replace(Source & " " & yearStart, "/", "-")
     Else
-        ActiveSheet.name = Replace(Source & " " & yearStart & "" & yearEnd, "/", "-")
+        ActiveSheet.name = Replace(Source & " " & yearStart & "—" & yearEnd, "/", "-")
     End If
     
     Exit Sub
@@ -201,7 +201,7 @@ Public Sub FindShipstationReport()
     FoundSheet = False
     
     For Each wsSheet In Worksheets
-        If wsSheet.name Like "Shipstation**" Then
+        If wsSheet.name Like "Shipstation*—*" Then
             FoundSheet = True
             GoTo Exit_Loop
         End If
@@ -211,7 +211,7 @@ Exit_Loop:
         HerkoDropshipReports.Show
         Call ImportShipstationReport(ChosenSheet)
     Else
-        MsgBox "Couldn't find a Shipstation report to import."
+        MsgBox ("Couldn't find a Shipstation report to import.")
     End If
 
 End Sub
@@ -231,55 +231,72 @@ Public Sub ImportShipstationReport(ChosenSheet As Worksheet)
     'format date column
     FormatDate
     
+    FormatPercent
+    
     'Fill in Ship Date, Shipping Cost, and Selling Price
     Call Formula(HerkoReportName, ShipstationNumRows)
     
+    'Add Percent Column
+    range("M1").value = "Profit/Loss %"
+    range("M2:M" & ShipstationNumRows).Formula = "=L2/J2"
+    
+    'Totals
+    range("H" & ShipstationNumRows + 1).Formula = "=SUM(H2:H" & ShipstationNumRows & ")"
+    range("L" & ShipstationNumRows + 1).Formula = "=SUM(L2:L" & ShipstationNumRows & ")"
+    range("M" & ShipstationNumRows + 1).Formula = "=AVERAGE(M2:M" & ShipstationNumRows & ")"
+    
     'resize the profit column
-    Range("A:L").EntireColumn.AutoFit
+    range("A:M").EntireColumn.AutoFit
     
     Call RenameSheet("Herko", ShipstationNumRows)
     
-    Range("A1").Select
+    range("A1").Select
 
 End Sub
 
 Private Sub InsertDate()
 
-    Range("A1").EntireColumn.Insert
+    range("A1").EntireColumn.Insert
       
-    Range("A1").Value = "Ship Date"
+    range("A1").value = "Ship Date"
 
 End Sub
 
 Private Sub FormatDate()
 
-    Range("A:A").NumberFormat = "mm/dd/yyyy"
+    range("A:A").NumberFormat = "mm/dd/yyyy"
+
+End Sub
+
+Private Sub FormatPercent()
+
+    range("M:M").NumberFormat = "0.00%"
 
 End Sub
 
 Private Sub Formula(HerkoReportName As String, LastRow As Integer)
     
     'final query
-    Range("A2:A" & LastRow).Formula = "=INDEX('" & HerkoReportName & "'!A:A,MATCH(C2,'" & HerkoReportName & "'!C:C,0))"
-    Range("I2:I" & LastRow).Formula = "=INDEX('" & HerkoReportName & "'!E:E,MATCH(C2,'" & HerkoReportName & "'!C:C,0))"
-    Range("K2:K" & LastRow).Formula = "=INDEX('" & HerkoReportName & "'!D:D,MATCH(C2,'" & HerkoReportName & "'!C:C,0))"
+    range("A2:A" & LastRow).Formula = "=INDEX('" & HerkoReportName & "'!A:A,MATCH(C2,'" & HerkoReportName & "'!C:C,0))"
+    range("I2:I" & LastRow).Formula = "=INDEX('" & HerkoReportName & "'!E:E,MATCH(C2,'" & HerkoReportName & "'!C:C,0))"
+    range("K2:K" & LastRow).Formula = "=INDEX('" & HerkoReportName & "'!D:D,MATCH(C2,'" & HerkoReportName & "'!C:C,0))"
     
     'Replace formulas in Ship Date, Shipping Cost, and Selling Price with values
-    With Range("A2:A" & LastRow)
+    With range("A2:A" & LastRow)
         .Cells.Copy
         .Cells.PasteSpecial xlPasteValues
         .Cells(1).Select
     End With
     Application.CutCopyMode = False
     
-    With Range("I2:I" & LastRow)
+    With range("I2:I" & LastRow)
         .Cells.Copy
         .Cells.PasteSpecial xlPasteValues
         .Cells(1).Select
     End With
     Application.CutCopyMode = False
     
-    With Range("K2:K" & LastRow)
+    With range("K2:K" & LastRow)
         .Cells.Copy
         .Cells.PasteSpecial xlPasteValues
         .Cells(1).Select

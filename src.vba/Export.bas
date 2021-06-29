@@ -7,10 +7,10 @@ Public Sub XLSX()
     Dim sh As Worksheet
     Dim currentsheetname As Variant
     
-    'save current sheet's name to variable
+    'save current sheet(s)'s name to variable
     currentsheetname = Application.ActiveSheet.name
 
-    'activate current sheet and copy it
+    'activate current sheet(s) and copy it
     Set sh = Sheets(currentsheetname)
     sh.Copy
     'add extension to sheet name
@@ -119,7 +119,7 @@ Public Sub EmailMain()
     Application.ScreenUpdating = False
     
     'name email attachments based on how many sheets user has selected
-    If ActiveWindow.SelectedSheets.Count > 1 Then
+    If ActiveWindow.SelectedSheets.count > 1 Then
         LFileName = "Workbook Attachment"
     Else
         LFileName = ActiveSheet.name
@@ -129,6 +129,9 @@ Public Sub EmailMain()
     If NameValid(LFileName) = True Then
         
         'copy all selected sheets to new temp workbook
+''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        'NEED TO MAKE A CHECK FOR TABLES IN THE SHEET
+''''''''''''''''''''''''''''''''''''''''''''''''''''''
         ActiveWindow.SelectedSheets.Copy
         Set LWorkbook = ActiveWorkbook
         
@@ -166,7 +169,7 @@ Public Sub EmailMain()
         Set oApp = Nothing
         
     Else
-        MsgBox "The file name is invalid. Please rename attachment."
+        MsgBox ("The file name is invalid. Please rename attachment.")
     End If
 
 End Sub

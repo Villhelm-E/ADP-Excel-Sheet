@@ -13,10 +13,10 @@ Public Sub FormattedToSixbit()
     
     'Set Category
     Dim Category As String
-    Category = SixbitCategory(Range("F2").Value)
+    Category = SixbitCategory(range("F2").value)
     
     'Grab Part Type from cell F2
-    PartTypeVar = Range("F2").Value
+    PartTypeVar = range("F2").value
     
     'Set Ordinal ID
     Dim OrdinalID As String
@@ -36,14 +36,14 @@ Public Sub FormattedToSixbit()
     Exit Sub
     
 Err_ToSixbit:
-    MsgBox "There was a problem adding fitments to Sixbit."
+    MsgBox ("There was a problem adding fitments to Sixbit.")
 
 End Sub
 
 Private Sub CheckNewColumn()
 
-    If Range("AY1").Value = "NewColumn" And Range("AY2").Value = "[Table]" Then
-        Range("AY:AY").EntireColumn.Delete
+    If range("AY1").value = "NewColumn" And range("AY2").value = "[Table]" Then
+        range("AY:AY").EntireColumn.Delete
     End If
 
 End Sub
@@ -55,8 +55,8 @@ Public Function SixbitCategory(PartTyp As String) As String
     
     With rst
         While Not .EOF
-            If .Fields("ACESPartType").Value = PartTyp Then
-                SixbitCategory = .Fields("EbayCategoryID").Value  'set ebay category id
+            If .fields("ACESPartType").value = PartTyp Then
+                SixbitCategory = .fields("EbayCategoryID").value  'set ebay category id
                 rst.Close
                 Exit Function
             End If
@@ -74,7 +74,7 @@ Private Function MaxOrdinalID(OrdinalID As String) As String
     OpenOrdinalID
         
     'Add 1 to max value
-    MaxOrdinalID = rst.Fields("OrdinalID").Value + 1
+    MaxOrdinalID = rst.fields("OrdinalID").value + 1
 
 End Function
 
@@ -84,10 +84,10 @@ Private Sub NewCompatibilityRecord(OrdinalID As String, Category As String, SKU 
     
     rst.Close
     
-    rst.Open "INSERT INTO dbo.CompatibilitySets ([Name], CategoryID, OrdinalID) VALUES (" & Chr(39) & SKU & Chr(39) & ", " & Val(Category) & ", " & Val(OrdinalID) & ")", _
+    rst.Open "INSERT INTO dbo.CompatibilitySets ([Name], CategoryID, OrdinalID) VALUES (" & Chr(39) & SKU & Chr(39) & ", " & val(Category) & ", " & val(OrdinalID) & ")", _
         SxbtDb, adOpenDynamic, adLockOptimistic
             
-    MsgBox "Added Compatibility"
+    MsgBox ("Added Compatibility")
     
     Exit Sub
     
@@ -166,17 +166,17 @@ Private Sub XMLParser(SKU As String)
     
     Call EndTags(SKU)
     
-    MsgBox "Fitments added successfully"
+    MsgBox ("Fitments added successfully")
 
 End Sub
 
 Private Sub loopliters(liters, i As Integer)
 
     'liters is column 36
-    If IsNull(Cells(i, 36).Value) = True Then
+    If IsNull(Cells(i, 36).value) = True Then
         liters = ""
     Else
-        liters = Cells(i, 36).Value & "L"
+        liters = Cells(i, 36).value & "L"
     End If
 
 End Sub
@@ -184,10 +184,10 @@ End Sub
 Private Sub loopCC(cc, i As Integer)
 
     'cubic centimeters is column 19
-    If IsNull(Cells(i, 19).Value) = True Then
+    If IsNull(Cells(i, 19).value) = True Then
         cc = ""
     Else
-        cc = " " & Cells(i, 19).Value & "CC"
+        cc = " " & Cells(i, 19).value & "CC"
     End If
 
 End Sub
@@ -195,10 +195,10 @@ End Sub
 Private Sub loopcid(cid, i As Integer)
 
     'cubic inches is column 20
-        If IsNull(Cells(i, 20).Value) = True Then
+        If IsNull(Cells(i, 20).value) = True Then
             cid = ""
         Else
-            cid = " " & Cells(i, 20).Value & "Cu. In."
+            cid = " " & Cells(i, 20).value & "Cu. In."
         End If
         
 End Sub
@@ -206,14 +206,14 @@ End Sub
 Private Sub loopBlock(block, i As Integer)
 
         'block is column 14
-        If IsNull(Cells(i, 14).Value) = True Then
+        If IsNull(Cells(i, 14).value) = True Then
             block = ""
         Else
             'need to lowercase the L for inline block
-            If Cells(i, 14).Value = "L" Then
+            If Cells(i, 14).value = "L" Then
                 block = " l"
             Else
-                block = " " & Cells(i, 14).Value
+                block = " " & Cells(i, 14).value
             End If
         End If
         
@@ -222,10 +222,10 @@ End Sub
 Private Sub loopCyl(cylinders, i As Integer)
 
         'cylinders is column 22
-        If IsNull(Cells(i, 22).Value) = True Then
+        If IsNull(Cells(i, 22).value) = True Then
             cylinders = ""
         Else
-            cylinders = Cells(i, 22).Value
+            cylinders = Cells(i, 22).value
         End If
         
 End Sub
@@ -233,10 +233,10 @@ End Sub
 Private Sub loopfuel(fuel, i As Integer)
 
         'fuel type is column 34
-        If IsNull(Cells(i, 34).Value) = True Then
+        If IsNull(Cells(i, 34).value) = True Then
             fuel = ""
         Else
-            fuel = " " & Cells(i, 34).Value
+            fuel = " " & Cells(i, 34).value
         End If
         
 End Sub
@@ -244,10 +244,10 @@ End Sub
 Private Sub loopcylhedtyp(cylhedtyp, i As Integer)
 
         'cylinder head type is column 21
-        If IsNull(Cells(i, 21).Value) = True Then
+        If IsNull(Cells(i, 21).value) = True Then
             cylhedtyp = ""
         Else
-            cylhedtyp = " " & Cells(i, 21).Value
+            cylhedtyp = " " & Cells(i, 21).value
         End If
         
 End Sub
@@ -255,10 +255,10 @@ End Sub
 Private Sub loopaspiration(aspiration, i As Integer)
 
         'aspiration is column 11
-        If IsNull(Cells(i, 11).Value) = True Then
+        If IsNull(Cells(i, 11).value) = True Then
             aspiration = ""
         Else
-            aspiration = " " & Cells(i, 11).Value
+            aspiration = " " & Cells(i, 11).value
         End If
         
 End Sub
@@ -266,10 +266,10 @@ End Sub
 Private Sub loopvin(enginevin, i As Integer)
 
         'engine vin is column 27
-        If IsNull(Cells(i, 27).Value) = True Then
+        If IsNull(Cells(i, 27).value) = True Then
             enginevin = ""
         Else
-            enginevin = "VIN: " & Cells(i, 27).Value
+            enginevin = "VIN: " & Cells(i, 27).value
         End If
         
 End Sub
@@ -277,10 +277,10 @@ End Sub
 Private Sub loopbodynumdoors(bodynumdoors, i As Integer)
         
         'bodynumdoors is column 15
-        If IsNull(Cells(i, 15).Value) = True Then
+        If IsNull(Cells(i, 15).value) = True Then
             bodynumdoors = ""
         Else
-            bodynumdoors = Cells(i, 15).Value & "-Door"
+            bodynumdoors = Cells(i, 15).value & "-Door"
         End If
         
 End Sub
@@ -288,10 +288,10 @@ End Sub
 Private Sub loopbodytype(bodytype, i As Integer)
         
         'body type is column 16
-        If IsNull(Cells(i, 16).Value) = True Then
+        If IsNull(Cells(i, 16).value) = True Then
             bodytype = ""
         Else
-            bodytype = Cells(i, 16).Value & " "
+            bodytype = Cells(i, 16).value & " "
         End If
         
 End Sub
@@ -299,10 +299,10 @@ End Sub
 Private Sub looptrim(trim, bodytype, bodynumdoors, i As Integer)
         
         'trim is column 43
-        If IsNull(Cells(i, 43).Value) = True Then
+        If IsNull(Cells(i, 43).value) = True Then
             trim = ""
         Else
-            trim = Cells(i, 43).Value & " " & bodytype & bodynumdoors
+            trim = Cells(i, 43).value & " " & bodytype & bodynumdoors
         End If
         
 End Sub
@@ -310,10 +310,10 @@ End Sub
 Private Sub loopnotes(prenote, i As Integer)
         
         'notes is column 7
-        If IsNull(Cells(i, 7).Value) = True Then
+        If IsNull(Cells(i, 7).value) = True Then
             prenote = ""
         Else
-            prenote = Cells(i, 7).Value & " "
+            prenote = Cells(i, 7).value & " "
         End If
         
 End Sub
@@ -328,12 +328,12 @@ Private Sub ParseCompatibility(liters, cc, cid, block, cylinders, fuel, cylheadt
     'fields are grouped into <NameValue></NameValue>
     'Name Value is split into <Name>Field</Name> and <Value></Value>
     engine = "<NameValue><Name>Engine</Name><Value>" & liters & cc & cid & block & cylinders & fuel & cylheadtype & aspiration & "</Value></NameValue>"
-    make = "<NameValue><Name>Make</Name><Value>" & Cells(i, 3).Value & "</Value></NameValue>"
-    model = "<NameValue><Name>Model</Name><Value>" & Cells(i, 4).Value & "</Value></NameValue>"
-    year = "<NameValue><Name>Year</Name><Value>" & Cells(i, 5).Value & "</Value></NameValue>"
+    make = "<NameValue><Name>Make</Name><Value>" & Cells(i, 3).value & "</Value></NameValue>"
+    model = "<NameValue><Name>Model</Name><Value>" & Cells(i, 4).value & "</Value></NameValue>"
+    year = "<NameValue><Name>Year</Name><Value>" & Cells(i, 5).value & "</Value></NameValue>"
     
     'If fitment doesn't specify submodel, enter ALL, otherwise put the submodel in the trim xml tag
-    If IsNull(Cells(i, 43).Value) = True Then
+    If IsNull(Cells(i, 43).value) = True Then
         trim = "<NameValue><Name>Trim</Name><Value>All</Value></NameValue>"
     Else
         trim = "<NameValue><Name>Trim</Name><Value>" & trim & "</Value></NameValue>"
@@ -341,7 +341,7 @@ Private Sub ParseCompatibility(liters, cc, cid, block, cylinders, fuel, cylheadt
     
     'Notes doesn't use <NameValue><Name></Name><Value></Value></NameValue>, just use <Notes></Notes>
     'add the part type from column 6
-    notes = "<Notes>" & prenote & enginevin & " PartType " & Cells(i, 6).Value & "</Notes>"
+    notes = "<Notes>" & prenote & enginevin & " PartType " & Cells(i, 6).value & "</Notes>"
     
     'each compatibility is enclosed by <Compatibility></Compatibility>
     fitment = "<Compatibility>" & engine & make & model & trim & year & notes & "</Compatibility>"
@@ -373,7 +373,7 @@ Private Sub AppendCompatibility(fitment As String, SKU As String)
     
 fitment_error:
     MsgBox Err.Description
-    MsgBox "There was an error appending a compatibility set into the table."
+    MsgBox ("There was an error appending a compatibility set into the table.")
 
 End Sub
 
@@ -388,6 +388,6 @@ Private Sub EndTags(SKU As String)
     
 end_tag_error:
     MsgBox Err.Description
-    MsgBox "There was an error appending the end tags."
+    MsgBox ("There was an error appending the end tags.")
 
 End Sub

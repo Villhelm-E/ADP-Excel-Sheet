@@ -3,7 +3,7 @@ Option Explicit
 Public Sub FindSetsMain()
 
     'Check to see if user-entered part number matches part number in sheet
-    If PartNumMatch(Range("A2")) = False Then   'Checks module
+    If PartNumMatch(range("A2")) = False Then   'Checks module
         Reopen = True   'Reopen makes SourceForm ask the user for fitment Source
         SourceForm.Show
     End If
@@ -16,9 +16,9 @@ Public Sub FindSetsMain()
         End If
     Else
         If PartName = InterchangeSource Then
-            MsgBox "Fitments for this part are already in the database. See " & PartName
+            MsgBox ("Fitments for this part are already in the database. See " & PartName)
         Else
-            MsgBox "Fitments for this part are already in database. See " & PartName & " or " & InterchangeSource & "."
+            MsgBox ("Fitments for this part are already in database. See " & PartName & " or " & InterchangeSource & ".")
         End If
     End If
 
@@ -35,8 +35,8 @@ Private Function DuplicateFound() As Boolean
     
     'checks to see if user-entered part number is already in the database
     While rst.EOF = False
-        If (rst.Fields("PartNum").Value = PartName Or rst.Fields("InterchangeSource").Value = InterchangeSource) And _
-        rst.Fields("Source").Value = FitmentSource And rst.Fields("BrandName").Value = Brand Then
+        If (rst.fields("PartNum").value = PartName Or rst.fields("InterchangeSource").value = InterchangeSource) And _
+        rst.fields("Source").value = FitmentSource And rst.fields("BrandName").value = Brand Then
             'if part is found, close the sub, don't have to search the interchangesource
             DuplicateFound = True
             'if duplicate is found, stop searching
@@ -67,19 +67,19 @@ Private Sub ACCExport()
     'Revert excel sheet back to regular spaces and ampersands
     RevertExcel
     
-    MsgBox "Fitments exported successfully"
+    MsgBox ("Fitments exported successfully")
 
 End Sub
 
 Private Sub MatchSixbitFormatting()
 
     'replace ampersands with html code for ampersand
-    Range("A:AX").Replace "&", "&amp;"
+    range("A:AX").Replace "&", "&amp;"
     
     'replace spaces with non-breaking spaces
-    Range("A:J").Replace " ", " "              'first string in regular space, second string is non-breaking space
-    Range("L:O").Replace " ", " "
-    Range("Q:AX").Replace " ", " "
+    range("A:J").Replace " ", " "              'first string in regular space, second string is non-breaking space
+    range("L:O").Replace " ", " "
+    range("Q:AX").Replace " ", " "
     
     'Column K (Aspiration) and column P (Body Type) need to have regular spaces
 
@@ -91,74 +91,74 @@ Private Sub AddFields()
     OpenCompatibilityListTable
     
     'all records in a table
-    Dim R As Long
-    R = 2
+    Dim r As Long
+    r = 2
     
     'loop until first empty cell in column A
-    Do While Len(Range("A" & R).Formula) > 0
+    Do While Len(range("A" & r).Formula) > 0
         With rst
             'create a new record
             .AddNew
             'add values to each field in the appropriate Fitments table
-            .Fields("part") = Range("A" & R).Value
-            .Fields("brand_code") = Range("B" & R).Value
-            .Fields("make") = Range("C" & R).Value
-            .Fields("model") = Range("D" & R).Value
-            .Fields("year") = Range("E" & R).Value
-            .Fields("partterminologyname") = Range("F" & R).Value
-            .Fields("notes") = Range("G" & R).Value
-            .Fields("qty") = Range("H" & R).Value
-            .Fields("mfrlabel") = Range("I" & R).Value
-            .Fields("position") = Range("J" & R).Value
-            .Fields("aspiration") = Range("K" & R).Value
-            .Fields("bedlength") = Range("L" & R).Value
-            .Fields("bedtype") = Range("M" & R).Value
-            .Fields("block") = Range("N" & R).Value
-            .Fields("bodynumdoors") = Range("O" & R).Value
-            .Fields("bodytype") = Range("P" & R).Value
-            .Fields("brakeabs") = Range("Q" & R).Value
-            .Fields("brakesystem") = Range("R" & R).Value
-            .Fields("cc") = Range("S" & R).Value
-            .Fields("cid") = Range("T" & R).Value
-            .Fields("cylinderheadtype") = Range("U" & R).Value
-            .Fields("cylinders") = Range("V" & R).Value
-            .Fields("drivetype") = Range("W" & R).Value
-            .Fields("enginedesignation") = Range("X" & R).Value
-            .Fields("enginemfr") = Range("Y" & R).Value
-            .Fields("engineversion") = Range("Z" & R).Value
-            .Fields("enginevin") = Range("AA" & R).Value
-            .Fields("frontbraketype") = Range("AB" & R).Value
-            .Fields("frontspringtype") = Range("AC" & R).Value
-            .Fields("fueldeliverysubtype") = Range("AD" & R).Value
-            .Fields("fueldeliverytype") = Range("AE" & R).Value
-            .Fields("fuelsystemcontroltype") = Range("AF" & R).Value
-            .Fields("fuelsystemdesign") = Range("AG" & R).Value
-            .Fields("fueltype") = Range("AH" & R).Value
-            .Fields("ignitionsystemtype") = Range("AI" & R).Value
-            .Fields("liters") = Range("AJ" & R).Value
-            .Fields("mfrbodycode") = Range("AK" & R).Value
-            .Fields("rearbraketype") = Range("AL" & R).Value
-            .Fields("rearspringtype") = Range("AM" & R).Value
-            .Fields("region") = Range("AN" & R).Value
-            .Fields("steeringsystem") = Range("AO" & R).Value
-            .Fields("steeringtype") = Range("AP" & R).Value
-            .Fields("submodel") = Range("AQ" & R).Value
-            .Fields("transmissioncontroltype") = Range("AR" & R).Value
-            .Fields("transmissionmfr") = Range("AS" & R).Value
-            .Fields("transmissionmfrcode") = Range("AT" & R).Value
-            .Fields("transmissionnumspeeds") = Range("AU" & R).Value
-            .Fields("transmissiontype") = Range("AV" & R).Value
-            .Fields("valvesperengine") = Range("AW" & R).Value
-            .Fields("wheelbase") = Range("AX" & R).Value
-            .Fields("Source") = FitmentSource
-            .Fields("InterchangeSource") = InterchangeSource
-            .Fields("BrandName") = Brand
+            .fields("part") = range("A" & r).value
+            .fields("brand_code") = range("B" & r).value
+            .fields("make") = range("C" & r).value
+            .fields("model") = range("D" & r).value
+            .fields("year") = range("E" & r).value
+            .fields("partterminologyname") = range("F" & r).value
+            .fields("notes") = range("G" & r).value
+            .fields("qty") = range("H" & r).value
+            .fields("mfrlabel") = range("I" & r).value
+            .fields("position") = range("J" & r).value
+            .fields("aspiration") = range("K" & r).value
+            .fields("bedlength") = range("L" & r).value
+            .fields("bedtype") = range("M" & r).value
+            .fields("block") = range("N" & r).value
+            .fields("bodynumdoors") = range("O" & r).value
+            .fields("bodytype") = range("P" & r).value
+            .fields("brakeabs") = range("Q" & r).value
+            .fields("brakesystem") = range("R" & r).value
+            .fields("cc") = range("S" & r).value
+            .fields("cid") = range("T" & r).value
+            .fields("cylinderheadtype") = range("U" & r).value
+            .fields("cylinders") = range("V" & r).value
+            .fields("drivetype") = range("W" & r).value
+            .fields("enginedesignation") = range("X" & r).value
+            .fields("enginemfr") = range("Y" & r).value
+            .fields("engineversion") = range("Z" & r).value
+            .fields("enginevin") = range("AA" & r).value
+            .fields("frontbraketype") = range("AB" & r).value
+            .fields("frontspringtype") = range("AC" & r).value
+            .fields("fueldeliverysubtype") = range("AD" & r).value
+            .fields("fueldeliverytype") = range("AE" & r).value
+            .fields("fuelsystemcontroltype") = range("AF" & r).value
+            .fields("fuelsystemdesign") = range("AG" & r).value
+            .fields("fueltype") = range("AH" & r).value
+            .fields("ignitionsystemtype") = range("AI" & r).value
+            .fields("liters") = range("AJ" & r).value
+            .fields("mfrbodycode") = range("AK" & r).value
+            .fields("rearbraketype") = range("AL" & r).value
+            .fields("rearspringtype") = range("AM" & r).value
+            .fields("region") = range("AN" & r).value
+            .fields("steeringsystem") = range("AO" & r).value
+            .fields("steeringtype") = range("AP" & r).value
+            .fields("submodel") = range("AQ" & r).value
+            .fields("transmissioncontroltype") = range("AR" & r).value
+            .fields("transmissionmfr") = range("AS" & r).value
+            .fields("transmissionmfrcode") = range("AT" & r).value
+            .fields("transmissionnumspeeds") = range("AU" & r).value
+            .fields("transmissiontype") = range("AV" & r).value
+            .fields("valvesperengine") = range("AW" & r).value
+            .fields("wheelbase") = range("AX" & r).value
+            .fields("Source") = FitmentSource
+            .fields("InterchangeSource") = InterchangeSource
+            .fields("BrandName") = Brand
     
             'stores the new record
             .Update
         End With
     'next row
-    R = R + 1
+    r = r + 1
     Loop
     
     'Close connection and wipe data
@@ -172,18 +172,18 @@ Private Sub FirstPart()
     'Sends each row to a row in the Second Part Table
     OpenPrimaryPartTable
 
-    Dim R As Long
-    R = 2
+    Dim r As Long
+    r = 2
     
     With rst
         'create a new record
         .AddNew
         'add values to each field in the record
-        .Fields("PartNum") = PartName
-        .Fields("PartType") = PartTypeVar
-        .Fields("Source") = FitmentSource
-        .Fields("InterchangeSource") = InterchangeSource
-        .Fields("BrandName") = Brand
+        .fields("PartNum") = PartName
+        .fields("PartType") = PartTypeVar
+        .fields("Source") = FitmentSource
+        .fields("InterchangeSource") = InterchangeSource
+        .fields("BrandName") = Brand
         .Update
     End With
     
@@ -198,18 +198,18 @@ Private Sub SecondPart()
     'Sends each row to a row in the Second Part Table
     OpenSecondaryPartTable
 
-    Dim R As Long
-    R = 2
+    Dim r As Long
+    r = 2
     
     With rst
         'create a new record
         .AddNew
         'add values to each field in the record
-        .Fields("PartNum") = PartName
-        .Fields("PartType") = PartTypeVar
-        .Fields("Source") = FitmentSource
-        .Fields("InterchangeSource") = InterchangeSource
-        .Fields("BrandName") = Brand
+        .fields("PartNum") = PartName
+        .fields("PartType") = PartTypeVar
+        .fields("Source") = FitmentSource
+        .fields("InterchangeSource") = InterchangeSource
+        .fields("BrandName") = Brand
         .Update
     End With
 
@@ -222,10 +222,9 @@ End Sub
 Private Sub RevertExcel()
 
     'replace html code for ampersand with regular ampersands
-    Range("A:AX").Replace "&amp;", "&"
+    range("A:AX").Replace "&amp;", "&"
     
     'replace spaces with non-breaking spaces
-    Range("A:AX").Replace " ", " "              'first string is non-brekaing space, second string is regular space
+    range("A:AX").Replace " ", " "              'first string is non-brekaing space, second string is regular space
 
 End Sub
-

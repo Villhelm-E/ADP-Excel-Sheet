@@ -1,9 +1,16 @@
 Option Explicit
 
-Declare Function apiCopyFile Lib "KERNEL32" Alias "CopyFileA" _
+#If Win64 Then
+    Declare PtrSafe Function apiCopyFile Lib "KERNEL32" Alias "CopyFileA" _
     (ByVal lpExistingFileName As String, _
         ByVal lpNewFileName As String, _
             ByVal bFailIfExists As Long) As Long
+#Else
+    Declare Function apiCopyFile Lib "KERNEL32" Alias "CopyFileA" _
+    (ByVal lpExistingFileName As String, _
+        ByVal lpNewFileName As String, _
+            ByVal bFailIfExists As Long) As Long
+#End If
             
 Public Function UpdateFeVersion(ThisVersion As String)
     On Error GoTo ProcError
@@ -26,10 +33,10 @@ Public Function UpdateFeVersion(ThisVersion As String)
     'Create the source's path and file name.
     strSourceFile = "\\ADP-SERVER\AD AutoParts Server\IT\ADP Systems - Source Code\ADP Excel Sheet\ADP Excel Sheet.xlsm"
     
-    Updated = Replace(rst.Fields("Version").Value, ".", "_")
+    Updated = Replace(rst.fields("Version").value, ".", "_")
     
     If Right(strCurrentBook, Len(ThisVersion)) = Replace(ThisVersion, ".", "_") Then
-        strDestFile = Left(strCurrentBook, Len(strCurrentBook) - (Len(ThisVersion) + 1)) & " " & Updated & ".xlsm"
+        strDestFile = left(strCurrentBook, Len(strCurrentBook) - (Len(ThisVersion) + 1)) & " " & Updated & ".xlsm"
     Else
         strDestFile = "ADP Excel Sheet " & Updated & ".xlsm"
     End If
@@ -44,15 +51,15 @@ Public Function UpdateFeVersion(ThisVersion As String)
     If LResponse = vbYes Then
         If Dir(strSourceFile) = "" Then 'something is wrong and the file is not there.
             
-            MsgBox "The file:" & vbCrLf & Chr(34) & strSourceFile & _
+            MsgBox ("The file:" & vbCrLf & Chr(34) & strSourceFile & _
                 Chr(34) & vbCrLf & vbCrLf & _
-                "is not a valid file name. Please see your Administrator.", _
+                "is not a valid file name. Please see your Administrator."), _
                 vbCritical, "Error updating To New Version..."
                 GoTo ExitProc
         Else
             'Message box informing update is happening
-            MsgBox "Application updated. Please wait while the application" & _
-                " restarts.", vbInformation, "Update Successful"
+            MsgBox ("Application updated. Please wait while the application" & _
+                " restarts."), vbInformation, "Update Successful"
             
             'Copy Excel Sheet from Server to final location
             Set sourceBook = Workbooks.Open(strSourceFile)
@@ -75,7 +82,7 @@ Public Function UpdateFeVersion(ThisVersion As String)
 ExitProc:
     Exit Function
 ProcError:
-    MsgBox "Error " & Err.Number & ": " & Err.Description, , _
+    MsgBox ("Error " & Err.Number & ": " & Err.Description), , _
         "Error in UpdateFEVersion event procedure..."
     Resume ExitProc
 End Function
@@ -104,14 +111,14 @@ Private Sub CopySheets(currentbook As Workbook, destBook As Workbook)
     Dim oldName As String
     
     'save number of sheets in new workbook
-    sheetIndex = destBook.Sheets.Count
+    sheetIndex = destBook.Sheets.count
     
     'loop through current workbook sheets
     For Each currentsheet In currentbook.Worksheets
         On Error GoTo Exit_Loop
         
         'loop through worksheets in new workbook
-        For i = 1 To Worksheets.Count
+        For i = 1 To Worksheets.count
             'if the worksheet already exists, set exists to true and end the loop
             If currentbook.Sheets(i).name = currentsheet.name Then
                 exists = True
@@ -159,5 +166,3 @@ Exit_Loop:
     'Ends looping through current workbook sheets
     'sheetindex doesn't have an upper bound, so it errors when it goes beyond scope
 End Sub
-
-

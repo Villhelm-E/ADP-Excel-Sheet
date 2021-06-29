@@ -12,12 +12,12 @@ Public Sub DefineAmazonVariables()
     
     'every update Amazon makes to the template changes the Version and Signature
     'update these in the Variables button under About in the ADP Tab
-    TemplateVersion = rst.Fields("AmazonTemplateVersion").Value
-    TemplateSignature = rst.Fields("AmazonTemplateSig").Value
+    TemplateVersion = rst.fields("AmazonTemplateVersion").value
+    TemplateSignature = rst.fields("AmazonTemplateSig").value
     
     'Amazon Template switched the name and label rows from Version 2018.0210 to 2018.0820
-    LabelRow = rst.Fields("LabelRow").Value    'global variable that determines which row on the Amazon template is for the Field Labels
-    NameRow = rst.Fields("NameRow").Value     'global variable that determines which row on the Amazon template is for the Field Names/Codes
+    LabelRow = rst.fields("LabelRow").value    'global variable that determines which row on the Amazon template is for the Field Labels
+    NameRow = rst.fields("NameRow").value     'global variable that determines which row on the Amazon template is for the Field Names/Codes
     
     rst.Close
 
@@ -31,7 +31,7 @@ Public Sub AmazonMain()
     
     'Amazon Listings sheet name
     Dim SheetName As String
-    SheetName = "Upload Template"
+    SheetName = "Amazon Template"
     
     Set wsSheet = Sheets(SheetName)
     On Error GoTo 0
@@ -57,7 +57,7 @@ Public Sub AmazonMain()
     'refresh ribbon
     RibbonCategories
     
-    Range("A4").Select
+    range("A4").Select
 
 End Sub
 
@@ -79,13 +79,13 @@ Public Sub AmazonHeaders()
     
     Dim columns As Integer
     yvgdsh.MoveFirst
-    columns = yvgdsh.Fields("CountCol").Value
+    columns = yvgdsh.fields("CountCol").value
 
     Dim i As Integer
 
     For i = 1 To columns
-        Cells(NameRow, i).Value = rst.Fields("Field_Name").Value  'NameRow is global variable
-        Cells(LabelRow, i).Value = rst.Fields("Label_Name").Value  'LabelRow is global variable
+        Cells(NameRow, i).value = rst.fields("Field_Name").value  'NameRow is global variable
+        Cells(LabelRow, i).value = rst.fields("Label_Name").value  'LabelRow is global variable
         rst.MoveNext
     Next i
     
@@ -94,7 +94,7 @@ Public Sub AmazonHeaders()
     Dim ColumnCount As Integer
     
     'Save the number and letter of the last column
-    lastcolumnletter = NumberToColumn(CountColumns(Range(LabelRow & ":" & LabelRow)))   'LabelRow is global variable
+    lastcolumnletter = NumberToColumn(CountColumns(range(LabelRow & ":" & LabelRow)))   'LabelRow is global variable
     
     'Format the UPC column to font size 14 and text so it doesn't show as scientific notation
     Call InitialFormatHeaders(lastcolumnletter)
@@ -110,10 +110,10 @@ End Sub
 
 Private Sub FillAmazonVariables()
 
-    Range("A1").Value = TemplateType
-    Range("B1").Value = TemplateVersion
-    Range("C1").Value = TemplateSignature
-    Range("D1").Value = TemplateAmazonUse
+    range("A1").value = TemplateType
+    range("B1").value = TemplateVersion
+    range("C1").value = TemplateSignature
+    range("D1").value = TemplateAmazonUse
 
 End Sub
 
@@ -127,8 +127,8 @@ Private Sub InitialFormatHeaders(lastcolumnletter As String)
     col = AmazonColumn(lastcolumnletter, "external_product_id")
     ColLet = NumberToColumn(col)
     
-    Range(ColLet & ":" & ColLet).NumberFormat = "@"
-    Range(ColLet & ":" & ColLet).Font.Size = "14"
+    range(ColLet & ":" & ColLet).NumberFormat = "@"
+    range(ColLet & ":" & ColLet).Font.Size = "14"
 
 End Sub
 
@@ -153,19 +153,19 @@ Private Sub HeaderColors()
         'loop through fields in AmazonTemplateFields
         Do While Not atf.EOF
             'compare the field in the Excel sheet with the Access table and do manual lookup
-            If atf.Fields("Field_Name").Value = Cells(NameRow, i).Value Then
+            If atf.fields("Field_Name").value = Cells(NameRow, i).value Then
                 'if Excel and Access table match on a field, save the Organization field value to variable
-                GroupVar = atf.Fields("Organization").Value
+                GroupVar = atf.fields("Organization").value
                 
                 'loop through AmazonFieldGroups
                 afg.MoveFirst
                 Do While Not afg.EOF
                     'do manual lookup of field Group
-                    If afg.Fields("Group").Value = GroupVar Then
+                    If afg.fields("Group").value = GroupVar Then
                         'paint Rows 1-3 with the color in the AmazonFieldGroups table that matches the variable from previous loop
-                        Cells(1, i).Interior.Color = RGB(afg.Fields("Red"), afg.Fields("Green"), afg.Fields("Blue"))
-                        Cells(2, i).Interior.Color = RGB(afg.Fields("Red"), afg.Fields("Green"), afg.Fields("Blue"))
-                        Cells(3, i).Interior.Color = RGB(afg.Fields("Red"), afg.Fields("Green"), afg.Fields("Blue"))
+                        Cells(1, i).Interior.Color = RGB(afg.fields("Red"), afg.fields("Green"), afg.fields("Blue"))
+                        Cells(2, i).Interior.Color = RGB(afg.fields("Red"), afg.fields("Green"), afg.fields("Blue"))
+                        Cells(3, i).Interior.Color = RGB(afg.fields("Red"), afg.fields("Green"), afg.fields("Blue"))
                     End If
                     afg.MoveNext
                 Loop
@@ -192,7 +192,7 @@ Private Sub FinalFormatHeaders()
     
     'next, shorten the fields that contain "TemplateSignature" and "The top 3 rows are for Amazon..."
     For i = 1 To numcols
-        If Cells(1, i).Value Like "TemplateSignature*" Or Cells(1, i).Value Like "The top 3 rows are for Amazon*" Then
+        If Cells(1, i).value Like "TemplateSignature*" Or Cells(1, i).value Like "The top 3 rows are for Amazon*" Then
             'set the width of the column with "TemplateSignature" or "The top 3 rows are for Amazon..." to the longest of cells in row 2 and 3 (autofit while ignoring row 1)
             columns(i).EntireColumn.ColumnWidth = WorksheetFunction.Max(Len(Cells(2, i)), Len(Cells(3, i)))
         End If

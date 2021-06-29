@@ -3,14 +3,12 @@ Option Explicit
 Private Sub UserForm_Initialize()
 
     'position the userform
-    Me.StartUpPosition = 0
-    Me.Left = Application.Left + (0.5 * Application.Width) - (0.5 * Me.Width)
-    Me.Top = Application.Top + (0.5 * Application.Height) - (0.5 * Me.Height)
+    Call CenterForm(HerkoDropshipReports)
 
     'Add Worksheets to Listbox
     Dim sheetsArr()
     ReDim sheetsArr(0)
-    Call SearchSheets(sheetsArr, "Shipstation*##**##") 'add every sheet that matches that pattern to an array
+    Call SearchSheets(sheetsArr, "Shipstation*##*—*##") 'add every sheet that matches that pattern to an array
 
     Dim i As Integer
     For i = LBound(sheetsArr) To UBound(sheetsArr)
@@ -38,9 +36,9 @@ End Sub
 Private Sub ImportButton_Click()
     
     Dim temp As String
-    temp = ListBox1.Value
+    temp = ListBox1.value
     
-    Set ChosenSheet = Application.Worksheets(ListBox1.Value)
+    Set ChosenSheet = Application.Worksheets(ListBox1.value)
     
     Unload Me
 

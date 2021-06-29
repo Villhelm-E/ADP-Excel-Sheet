@@ -11,15 +11,18 @@ Private Sub Workbook_Open()
     
 ''''Connect to Sixbit Database
     ConnectSixbitDatabase
+    
+    'toggle for debugging
+    DebugMode = False 'restart excel sheet to save changes
 
 End Sub
 
 'Run whenever any sheet changes
-Private Sub Workbook_SheetChange(ByVal sh As Object, ByVal Target As Range)
+Private Sub Workbook_SheetChange(ByVal sh As Object, ByVal target As range)
     
     'If code writes anything to worksheet, screenupdating will be turned off bypassing this subroutine
     'will only update ribbon if code isn't making changes to sheet
-    If Application.ScreenUpdating = True Then   'BypassRibbon is for debugging (specifically stepping into the code to skip refreshing the ribbon all the time)
+    If DebugMode = False Or Application.ScreenUpdating = True Then    'DebugMode is for debugging (specifically stepping into the code to skip refreshing the ribbon all the time)
         RibbonCategories    'Ribbon Module
     End If
 

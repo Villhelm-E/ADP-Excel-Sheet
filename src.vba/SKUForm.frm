@@ -9,9 +9,7 @@ End Sub
 Private Sub UserForm_Initialize()
 
     'position the userform
-    Me.StartUpPosition = 0
-    Me.Left = Application.Left + (0.5 * Application.Width) - (0.5 * Me.Width)
-    Me.Top = Application.Top + (0.5 * Application.Height) - (0.5 * Me.Height)
+    Call CenterForm(SKUForm)
     
     Me.SKUBox.SetFocus
 
@@ -19,10 +17,10 @@ End Sub
 
 Private Sub FormatBtn_Click()
 
-    If Me.SKUBox.Value = "" Then
-        MsgBox "Please choose a manufacturer."
+    If Me.SKUBox.value = "" Then
+        MsgBox ("Please choose a manufacturer.")
     Else
-        SKU = Me.SKUBox.Value   'SKU is global variable
+        SKU = Me.SKUBox.value   'SKU is global variable
         Unload Me
     End If
 
@@ -35,4 +33,3 @@ Private Sub CancelBtn_Click()
     Unload Me
 
 End Sub
-

@@ -13,9 +13,9 @@ Public Function CountRows(col) As Long
         
     Case 8  'string
         If InStr(1, col, ":") > 0 Then
-            CountRows = Application.CountA(Range(col))
+            CountRows = Application.CountA(range(col))
         Else
-            CountRows = Application.CountA(Range(col & ":" & col))
+            CountRows = Application.CountA(range(col & ":" & col))
         End If
         
     Case Else
@@ -25,10 +25,20 @@ Public Function CountRows(col) As Long
 
 End Function
 
+'Used for centering the referenced userform to the user's screen
+Public Sub CenterForm(ByRef frm)
+
+    'position the userform
+    frm.startupposition = 0
+    frm.left = Application.left + (0.5 * Application.width) - (0.5 * frm.width)
+    frm.top = Application.top + (0.5 * Application.height) - (0.5 * frm.height)
+
+End Sub
+
 'Function takes a range as input and returns the last row in range
 Public Function LastRow(col As String) As Long
     
-    LastRow = ActiveSheet.Cells(ActiveSheet.Rows.Count, col).End(xlUp).Row
+    LastRow = ActiveSheet.Cells(ActiveSheet.Rows.count, col).End(xlUp).row
 
 End Function
 
@@ -45,9 +55,9 @@ Public Function CountColumns(RowRange) As Integer
         
     Case 8  'string
         If InStr(1, RowRange, ":") > 0 Then
-            CountColumns = Application.CountA(Range(RowRange))
+            CountColumns = Application.CountA(range(RowRange))
         Else
-            CountColumns = Application.CountA(Range(RowRange & ":" & RowRange))
+            CountColumns = Application.CountA(range(RowRange & ":" & RowRange))
         End If
         
     Case Else
@@ -58,10 +68,10 @@ Public Function CountColumns(RowRange) As Integer
 End Function
 
 'Function takes column number as input and returns the column letter
-Public Function NumberToColumn(Column As Integer) As String
+Public Function NumberToColumn(column As Integer) As String
 
     Dim vArr
-    vArr = Split(Cells(1, Column).Address(True, False), "$")
+    vArr = Split(Cells(1, column).Address(True, False), "$")
     NumberToColumn = vArr(0)
 
 End Function
@@ -81,18 +91,18 @@ End Function
 'Function is meant to be used in Amazon Template
 Public Function AmazonColumn(lastcolumnletter As String, SearchItem As String) As Integer
 
-    Dim rFind As Range
-    Dim R As Range
+    Dim rFind As range
+    Dim r As range
     
     NameRow = 3
     
     'define range to search
-    Set R = Range("A" & NameRow & ":" & lastcolumnletter & NameRow)
+    Set r = range("A" & NameRow & ":" & lastcolumnletter & NameRow)
     
     'search through range to find column of where field name is found
-    Set rFind = R.Find(SearchItem, , , xlWhole, , , False, , False)
+    Set rFind = r.Find(SearchItem, , , xlWhole, , , False, , False)
     If Not rFind Is Nothing Then
-        AmazonColumn = rFind.Column
+        AmazonColumn = rFind.column
     End If
 
 End Function
@@ -115,3 +125,9 @@ Public Function CHECKSUM(Num As String) As String
     CHECKSUM = Num & WorksheetFunction.Ceiling(sum, 10) - sum
 
 End Function
+
+Public Sub ComputerName()
+
+    MsgBox (CreateObject("WScript.Network").ComputerName)
+
+End Sub

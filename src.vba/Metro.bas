@@ -44,8 +44,8 @@ Public Sub MetroMain()
         RepeatModels
         
         'Don't need info in columns A, B, E, F anymore
-        Range("A:B").Clear
-        Range("E:F").Clear
+        range("A:B").Clear
+        range("E:F").Clear
         
 ''''''''Loop through each row, moving things around as appropriate
         
@@ -63,16 +63,17 @@ Public Sub MetroMain()
         
         'Autofit fields and select A1
         columns("A:AX").AutoFit
-        Range("A1").Select
+        range("A1").Select
         
         'Rename sheet
+        FitmentSource = "Metro"
         RenameSheet         'WorksheetConnections Module
         
         'turn screen updating on
         Application.ScreenUpdating = True
         
         'Let user know tha formatting has completed
-        MsgBox "Done formatting fitments"
+        MsgBox ("Done formatting fitments")
     Else
         MsgBox ("You missed the expansion of some Makes or Models in Metro. They have been highlighted. Go back to Metro and make sure you expanded all Makes and Models.")
     End If
@@ -86,17 +87,17 @@ Private Function Expanded() As Boolean
     'default function to true
     Expanded = True
 
-    Dim R As Range
+    Dim r As range
     
     'checks every line for two consecutive blanks in column D
-    For Each R In Intersect(Range("D:D"), ActiveSheet.UsedRange)
-        If R.Value = "" And R.Offset(0, 1).Value = "" And R.Offset(0, 2).Value = "" Then
+    For Each r In Intersect(range("D:D"), ActiveSheet.UsedRange)
+        If r.value = "" And r.Offset(0, 1).value = "" And r.Offset(0, 2).value = "" Then
             'if it finds consecutive blanks, it sets function to false
             Expanded = False
-            If R.Offset(-1, 0).Value = "" Then
+            If r.Offset(-1, 0).value = "" Then
                 'if the cell to the left of the blank cell found above is blank, it highlights the cell above the cell to the left
                 'this is the Make that was not expanded in Metro
-                With R.Offset(-1, 1).Interior
+                With r.Offset(-1, 1).Interior
                     .Pattern = xlSolid
                     .PatternColorIndex = xlAutomatic
                     .Color = 65535
@@ -104,7 +105,7 @@ Private Function Expanded() As Boolean
             Else
                 'if the cell to the left is not blank, this code will highlight it
                 'this is a Model that was not expanded in Metro
-                With R.Offset(-1, 0).Interior
+                With r.Offset(-1, 0).Interior
                     .Pattern = xlSolid
                     .PatternColorIndex = xlAutomatic
                     .Color = 65535
@@ -115,19 +116,19 @@ Private Function Expanded() As Boolean
         
         'need special code to determine if the last Make or Model in the fitment list is expanded or not
         'can probably merge this code with the code above in the future
-        If IsNumeric(Left(R.Value, 4)) = False And R.Offset(0, 1).Value = "" And R.Offset(0, 2).Value = "" And R.Offset(1, 0).Value = "" And R.Offset(2, 0).Value = "" And _
-        R.Offset(1, 2).Value = "" And Not R.Offset(1, 1).Value = "" Then
+        If IsNumeric(left(r.value, 4)) = False And r.Offset(0, 1).value = "" And r.Offset(0, 2).value = "" And r.Offset(1, 0).value = "" And r.Offset(2, 0).value = "" And _
+        r.Offset(1, 2).value = "" And Not r.Offset(1, 1).value = "" Then
             Expanded = False
-            With R.Offset(1, 1).Interior
+            With r.Offset(1, 1).Interior
                 .Pattern = xlSolid
                 .PatternColorIndex = xlAutomatic
                 .Color = 65535
             End With
         Else
-            If IsNumeric(Left(R.Value, 4)) = False And R.Offset(0, 1).Value = "" And R.Offset(0, 2).Value = "" And R.Offset(1, 0).Value = "" And R.Offset(2, 0).Value = "" And _
-            R.Offset(1, 1).Value = "" And R.Offset(1, 2).Value = "" Then
+            If IsNumeric(left(r.value, 4)) = False And r.Offset(0, 1).value = "" And r.Offset(0, 2).value = "" And r.Offset(1, 0).value = "" And r.Offset(2, 0).value = "" And _
+            r.Offset(1, 1).value = "" And r.Offset(1, 2).value = "" Then
                 Expanded = False
-                With R.Interior
+                With r.Interior
                     .Pattern = xlSolid
                     .PatternColorIndex = xlAutomatic
                     .Color = 65535
@@ -135,7 +136,7 @@ Private Function Expanded() As Boolean
             End If
         End If
         
-    Next R
+    Next r
 
 End Function
 
@@ -145,7 +146,7 @@ Private Sub MoveEngines(numrows As Integer)
     
     For k = 1 To numrows
         'loop through each row and move the engine to column G
-        If IsNumeric(Left(Cells(k, 1).Value, 4)) Then
+        If IsNumeric(left(Cells(k, 1).value, 4)) Then
             Cells(k, 1).Cut ActiveSheet.Cells(k, 7)
         End If
     Next k
@@ -159,29 +160,29 @@ Private Sub CleanMakes(numrows As Integer)
     
     'loop through to remove year range from Make
     For k = 1 To numrows
-        If Not Cells(k, 1).Value = "" Then
+        If Not Cells(k, 1).value = "" Then
             'remove the year range
-            Cells(k, 1).Value = Left(Cells(k, 1), Len(Cells(k, 1)) - 9)
+            Cells(k, 1).value = left(Cells(k, 1), Len(Cells(k, 1)) - 9)
             
             'remove the count of models and move to column D
             If IsNumeric(Right(Cells(k, 1), 4)) Then
                 ModelCount = Right(Cells(k, 1), 4)
-                Cells(k, 1).Value = Left(Cells(k, 1), Len(Cells(k, 1)) - 4)
-                Cells(k, 4).Value = ModelCount
+                Cells(k, 1).value = left(Cells(k, 1), Len(Cells(k, 1)) - 4)
+                Cells(k, 4).value = ModelCount
             Else
                 If IsNumeric(Right(Cells(k, 1), 3)) Then
                     ModelCount = Right(Cells(k, 1), 3)
-                    Cells(k, 1).Value = Left(Cells(k, 1), Len(Cells(k, 1)) - 3)
-                    Cells(k, 4).Value = ModelCount
+                    Cells(k, 1).value = left(Cells(k, 1), Len(Cells(k, 1)) - 3)
+                    Cells(k, 4).value = ModelCount
                 Else
                     If IsNumeric(Right(Cells(k, 1), 2)) Then
                         ModelCount = Right(Cells(k, 1), 2)
-                        Cells(k, 1).Value = Left(Cells(k, 1), Len(Cells(k, 1)) - 2)
-                        Cells(k, 4).Value = ModelCount
+                        Cells(k, 1).value = left(Cells(k, 1), Len(Cells(k, 1)) - 2)
+                        Cells(k, 4).value = ModelCount
                     Else
                         ModelCount = Right(Cells(k, 1), 1)
-                        Cells(k, 1).Value = Left(Cells(k, 1), Len(Cells(k, 1)) - 1)
-                        Cells(k, 4).Value = ModelCount
+                        Cells(k, 1).value = left(Cells(k, 1), Len(Cells(k, 1)) - 1)
+                        Cells(k, 4).value = ModelCount
                     End If
                 End If
             End If
@@ -195,9 +196,9 @@ Private Sub ModelsPass1(numrows)
     Dim k As Integer
     
     For k = 1 To numrows
-        If Not Cells(k, 2).Value = "" Then
+        If Not Cells(k, 2).value = "" Then
             'removes year range from Model
-            Cells(k, 2).Value = Left(Cells(k, 2), Len(Cells(k, 2)) - 9)
+            Cells(k, 2).value = left(Cells(k, 2), Len(Cells(k, 2)) - 9)
         End If
     Next k
 
@@ -210,18 +211,18 @@ Private Sub ModelsPass2(numrows As Integer)
     Dim ModelCount As Integer
     
     For ModelPos = 1 To numrows
-        If Not Cells(ModelPos, 2).Value = "" Then
+        If Not Cells(ModelPos, 2).value = "" Then
             'count the Engines in column G under Model in column B
             For EnginePos = ModelPos + 1 To numrows
-                If Not Cells(EnginePos, 7).Value = "" Then
+                If Not Cells(EnginePos, 7).value = "" Then
                     'Count the Engine
                     ModelCount = ModelCount + 1
                 Else
                     'place modelcount in column E
-                    Cells(ModelPos, 5).Value = ModelCount
+                    Cells(ModelPos, 5).value = ModelCount
                     
                     'remove model count from Model
-                    Cells(ModelPos, 2).Value = Left(Cells(ModelPos, 2), Len(Cells(ModelPos, 2)) - Len(CStr(ModelCount)))
+                    Cells(ModelPos, 2).value = left(Cells(ModelPos, 2), Len(Cells(ModelPos, 2)) - Len(CStr(ModelCount)))
                     
                     'reset ModelCount
                     ModelCount = 0
@@ -239,108 +240,108 @@ End Sub
 Private Sub ConsolidateEngines()
 
     Dim k As Integer
-    Dim R As Range
+    Dim r As range
     
     k = 1
     
     'loop through all cells in column G to remove blank cells
-    For Each R In Intersect(Range("G:G"), ActiveSheet.UsedRange)
-        If Not R.Value = "" Then
-            R.Cut ActiveSheet.Cells(k, 7)
+    For Each r In Intersect(range("G:G"), ActiveSheet.UsedRange)
+        If Not r.value = "" Then
+            r.Cut ActiveSheet.Cells(k, 7)
             k = k + 1
         End If
-    Next R
+    Next r
 
 End Sub
 
 Private Sub ConsolidateNumPerVeh()
 
     Dim k As Integer
-    Dim R As Range
+    Dim r As range
     
     k = 1
     
     'loop through all cells in column C and move them to column H without blank cells
-    For Each R In Intersect(Range("C:C"), ActiveSheet.UsedRange)
-        If Not R.Value = "" Then
-            If R.Value Like "## per Vehicle" Then
-                Cells(k, 8).Value = Left(R, 2)
-                R.Value = ""
+    For Each r In Intersect(range("C:C"), ActiveSheet.UsedRange)
+        If Not r.value = "" Then
+            If r.value Like "## per Vehicle" Then
+                Cells(k, 8).value = left(r, 2)
+                r.value = ""
             Else
-                Cells(k, 8).Value = Left(R, 1)
-                R.Value = ""
+                Cells(k, 8).value = left(r, 1)
+                r.value = ""
             End If
             k = k + 1
         End If
-    Next R
+    Next r
 
 End Sub
 
 Private Sub ConsolidateModels()
 
     Dim k As Integer
-    Dim R As Range
+    Dim r As range
     
     k = 1
     
     'loop through all cells in column B to remove blank cells
-    For Each R In Intersect(Range("B:B"), ActiveSheet.UsedRange)
-        If Not R.Value = "" Then
-            R.Cut ActiveSheet.Cells(k, 2)
+    For Each r In Intersect(range("B:B"), ActiveSheet.UsedRange)
+        If Not r.value = "" Then
+            r.Cut ActiveSheet.Cells(k, 2)
             k = k + 1
         End If
-    Next R
+    Next r
 
 End Sub
 
 Private Sub ConsolidateMakes()
 
     Dim k As Integer
-    Dim R As Range
+    Dim r As range
     
     k = 1
     
     'loop through all cells in column A to remove blank cells
-    For Each R In Intersect(Range("A:A"), ActiveSheet.UsedRange)
-        If Not R.Value = "" Then
-            R.Cut ActiveSheet.Cells(k, 1)
+    For Each r In Intersect(range("A:A"), ActiveSheet.UsedRange)
+        If Not r.value = "" Then
+            r.Cut ActiveSheet.Cells(k, 1)
             k = k + 1
         End If
-    Next R
+    Next r
 
 End Sub
         
 Private Sub ConsolidateMakeCounts()
 
     Dim k As Integer
-    Dim R As Range
+    Dim r As range
     
     k = 1
     
     'loop through every cell in column E and move to column F without blank cells
-    For Each R In Intersect(Range("E:E"), ActiveSheet.UsedRange)
-        If Not R.Value = "" Then
-            R.Cut ActiveSheet.Cells(k, 6)
+    For Each r In Intersect(range("E:E"), ActiveSheet.UsedRange)
+        If Not r.value = "" Then
+            r.Cut ActiveSheet.Cells(k, 6)
             k = k + 1
         End If
-    Next R
+    Next r
 
 End Sub
         
 Private Sub ConsolidateModelCounts()
 
     Dim k As Integer
-    Dim R As Range
+    Dim r As range
     
     k = 1
     
     'loop through every cell in column D and move to column E withouth blank cells
-    For Each R In Intersect(Range("D:D"), ActiveSheet.UsedRange)
-        If Not R.Value = "" Then
-            R.Cut ActiveSheet.Cells(k, 5)
+    For Each r In Intersect(range("D:D"), ActiveSheet.UsedRange)
+        If Not r.value = "" Then
+            r.Cut ActiveSheet.Cells(k, 5)
             k = k + 1
         End If
-    Next R
+    Next r
 
 End Sub
 
@@ -362,10 +363,10 @@ Private Sub RepeatMakes()
     LColCPosition = 1
             
     'Search through values in column E until a blank cell is encountered
-    While Len(Range("A" & CStr(lRow)).Value) > 0
+    While Len(range("A" & CStr(lRow)).value) > 0
         'Retrieve quantity and Model
-        LQty = Range("E" & CStr(lRow)).Value
-        LProduct = Range("A" & CStr(lRow)).Value
+        LQty = range("E" & CStr(lRow)).value
+        LProduct = range("A" & CStr(lRow)).value
         
         'Set start and end position for copy to column B
         lStart = LColCPosition
@@ -373,7 +374,7 @@ Private Sub RepeatMakes()
         
         'Copy Model name the number of times that is given by the quantity
         For j = lStart To LEnd - 1
-            Range("C" & CStr(j)).Value = LProduct
+            range("C" & CStr(j)).value = LProduct
         Next
       
         'Update column B position
@@ -398,10 +399,10 @@ Private Sub RepeatModels()
     LColCPosition = 1
 
     'Repeats Model number of times in column F
-    While Len(Range("B" & CStr(lRow)).Value) > 0
+    While Len(range("B" & CStr(lRow)).value) > 0
         'Retrieve quantity and Model
-        LQty = Range("F" & CStr(lRow)).Value
-        LProduct = Range("B" & CStr(lRow)).Value
+        LQty = range("F" & CStr(lRow)).value
+        LProduct = range("B" & CStr(lRow)).value
             
         'Set start and end position for copy to column B
         lStart = LColCPosition
@@ -409,7 +410,7 @@ Private Sub RepeatModels()
       
         'Copy Model name the number of times that is given by the quantity
         For j = lStart To LEnd - 1
-            Range("D" & CStr(j)).Value = LProduct
+            range("D" & CStr(j)).value = LProduct
         Next
       
         'Update column B position
@@ -423,7 +424,7 @@ End Sub
 Private Sub FormatColumns()
 
     'Format column 36 as text so that Excel doesn't remove ".0" from liters like "5.0"
-    Range("AJ:AJ").NumberFormat = "@"
+    range("AJ:AJ").NumberFormat = "@"
 
 End Sub
 
@@ -478,163 +479,163 @@ Private Sub BigLoop(numrows As Integer)
 
 End Sub
 
-Private Sub CutYear(Row As Integer)
+Private Sub CutYear(row As Integer)
 
     Dim year As String
     
     'save first 4 numbers to variable
-    year = Left(Cells(Row, 7), 4)
+    year = left(Cells(row, 7), 4)
     
     'cut out the year from the engine info
-    Cells(Row, 7).Value = Right(Cells(Row, 7), Len(Cells(Row, 7)) - 5)
+    Cells(row, 7).value = Right(Cells(row, 7), Len(Cells(row, 7)) - 5)
     
     'Place year in what will be the ACES year field
-    Cells(Row, 5).Value = year
+    Cells(row, 5).value = year
 
 End Sub
 
-Private Sub CutLiters(Row As Integer)
+Private Sub CutLiters(row As Integer)
 
     Dim Volume As String
  
-    If Cells(Row, 7).Value Like "##.#L *" Then
+    If Cells(row, 7).value Like "##.#L *" Then
         'save the liters to variable
-        Volume = Left(Cells(Row, 7), 4)
+        Volume = left(Cells(row, 7), 4)
         
         'Cut liters from column G
-        Cells(Row, 7).Value = Right(Cells(Row, 7), Len(Cells(Row, 7)) - 6)
+        Cells(row, 7).value = Right(Cells(row, 7), Len(Cells(row, 7)) - 6)
         
         'place liters in column
-        Cells(Row, 7).Value = Volume
+        Cells(row, 7).value = Volume
     Else
         'save the liters to variable
-        Volume = Left(Cells(Row, 7), 3)
+        Volume = left(Cells(row, 7), 3)
         
         'cut liters from column G
-        Cells(Row, 7).Value = Right(Cells(Row, 7), Len(Cells(Row, 7)) - 5)
+        Cells(row, 7).value = Right(Cells(row, 7), Len(Cells(row, 7)) - 5)
         
         'place liters in column
-        Cells(Row, 36).Value = Volume
+        Cells(row, 36).value = Volume
     End If
 
 End Sub
 
-Private Sub CutCC(Row As Integer)
+Private Sub CutCC(row As Integer)
 
     'Cuts out CC
     Dim cc As String
 
-    If Cells(Row, 7).Value Like "###cc *" Then
+    If Cells(row, 7).value Like "###cc *" Then
         'save cc to variable
-        cc = Left(Cells(Row, 7).Value, 3)
+        cc = left(Cells(row, 7).value, 3)
         
         'cut cc out from column G
-        Cells(Row, 7).Value = Right(Cells(Row, 7).Value, Len(Cells(Row, 7)) - 6)
+        Cells(row, 7).value = Right(Cells(row, 7).value, Len(Cells(row, 7)) - 6)
         
         'place cc in column S
-        Cells(Row, 19).Value = cc
+        Cells(row, 19).value = cc
     Else
-        If Cells(Row, 7).Value Like "####cc *" Then
+        If Cells(row, 7).value Like "####cc *" Then
             'save cc to variable
-            cc = Left(Cells(Row, 7).Value, 4)
+            cc = left(Cells(row, 7).value, 4)
             
             'cut cc out of column G
-            Cells(Row, 7).Value = Right(Cells(Row, 7).Value, Len(Cells(Row, 7)) - 7)
+            Cells(row, 7).value = Right(Cells(row, 7).value, Len(Cells(row, 7)) - 7)
             
             'place cc in column S
-            Cells(Row, 19).Value = cc
+            Cells(row, 19).value = cc
         End If
     End If
 
 End Sub
 
-Private Sub CutCID(Row As Integer)
+Private Sub CutCID(row As Integer)
 
     'Cuts out cid
     Dim cid As String
     
-    If Cells(Row, 7).Value Like "##cid *" Then
+    If Cells(row, 7).value Like "##cid *" Then
         'save cid to variable
-        cid = Left(Cells(Row, 7).Value, 2)
+        cid = left(Cells(row, 7).value, 2)
         
         'cut cid out of column G
-        Cells(Row, 7).Value = Right(Cells(Row, 7).Value, Len(Cells(Row, 7)) - 6)
+        Cells(row, 7).value = Right(Cells(row, 7).value, Len(Cells(row, 7)) - 6)
         
         'place cid in column T
-        Cells(Row, 20).Value = cid
+        Cells(row, 20).value = cid
     Else
-        If Cells(Row, 7).Value Like "###cid *" Then
+        If Cells(row, 7).value Like "###cid *" Then
             'save cid to variable
-            cid = Left(Cells(Row, 7).Value, 3)
+            cid = left(Cells(row, 7).value, 3)
             
             'cut cid out of column G
-            Cells(Row, 7).Value = Right(Cells(Row, 7).Value, Len(Cells(Row, 7)) - 7)
+            Cells(row, 7).value = Right(Cells(row, 7).value, Len(Cells(row, 7)) - 7)
             
             'place cid in column T
-            Cells(Row, 20).Value = cid
+            Cells(row, 20).value = cid
         End If
     End If
 
 End Sub
 
-Private Sub CutCylinders(Row As Integer)
+Private Sub CutCylinders(row As Integer)
 
     Dim block As String
     Dim Cyl As String
 
     'Find Block+Cylinders in column G
-    If Cells(Row, 7).Value Like "L##*" Or Cells(Row, 7).Value Like "V##*" Or Cells(Row, 7).Value Like "H##*" Then
+    If Cells(row, 7).value Like "L##*" Or Cells(row, 7).value Like "V##*" Or Cells(row, 7).value Like "H##*" Then
         'if the number of cylinders is in the double digits
-        block = Left(Cells(Row, 7), 1)
-        Cyl = Mid(Cells(Row, 7), 2, 2)
+        block = left(Cells(row, 7), 1)
+        Cyl = Mid(Cells(row, 7), 2, 2)
         
-        Cells(Row, 14).Value = block    'column 14 = N
-        Cells(Row, 22).Value = Cyl      'column 22 = V
+        Cells(row, 14).value = block    'column 14 = N
+        Cells(row, 22).value = Cyl      'column 22 = V
         
         'if there's nothing after the block+cylinders, then leave cell blank
-        If Cells(Row, 7).Value = block & Cyl Then
-            Cells(Row, 7).Value = ""
+        If Cells(row, 7).value = block & Cyl Then
+            Cells(row, 7).value = ""
         Else
-            Cells(Row, 7).Value = Right(Cells(Row, 7), Len(Cells(Row, 7)) - 4)  'remove block+cylinders from column G
+            Cells(row, 7).value = Right(Cells(row, 7), Len(Cells(row, 7)) - 4)  'remove block+cylinders from column G
         End If
     Else
         'if the number of cylinders is in the single digits
-        If Cells(Row, 7).Value Like "L#*" Or Cells(Row, 7).Value Like "V#*" Or Cells(Row, 7).Value Like "H#*" Then
-            block = Left(Cells(Row, 7), 1)
-            Cyl = Mid(Cells(Row, 7), 2, 1)
+        If Cells(row, 7).value Like "L#*" Or Cells(row, 7).value Like "V#*" Or Cells(row, 7).value Like "H#*" Then
+            block = left(Cells(row, 7), 1)
+            Cyl = Mid(Cells(row, 7), 2, 1)
             
-            Cells(Row, 14).Value = block    'column 14 = N
-            Cells(Row, 22).Value = Cyl      'column 22 = V
+            Cells(row, 14).value = block    'column 14 = N
+            Cells(row, 22).value = Cyl      'column 22 = V
             
             'if there's nothing after the block+cylinders, then leave cell blank
-            If Cells(Row, 7).Value = block & Cyl Then
-                Cells(Row, 7).Value = ""
+            If Cells(row, 7).value = block & Cyl Then
+                Cells(row, 7).value = ""
             Else
-                Cells(Row, 7).Value = Right(Cells(Row, 7), Len(Cells(Row, 7)) - 3)
+                Cells(row, 7).value = Right(Cells(row, 7), Len(Cells(row, 7)) - 3)
             End If
         End If
     End If
 
 End Sub
 
-Private Sub CutCylinderHeadType(Row As Integer)
+Private Sub CutCylinderHeadType(row As Integer)
     
     'run query to return part types
     'Open Excel Sheet Version table from Master Database
     Set rst = MstrDb.Execute("SELECT [CylinderHeadType] FROM CylinderHeadTypes ORDER BY [ID]") 'rst is global variable
     
     'go through each row in column G (notes)
-    With Range("G" & Row)
+    With range("G" & row)
         With rst
             'start at beginning of CylinderHeadType field
             rst.MoveFirst
             'loop through the Cylinder Head Types in the master database
             While (Not .EOF)
                 'if any of the values in the CylinderHEadType field is found in the notes, cut it out and put it in column U
-                If Range("G" & Row).Value Like "*" & .Fields("CylinderHeadType").Value & "*" Then
-                    Cells(Row, 21).Value = .Fields("CylinderHeadType").Value
-                    Cells(Row, 7).Value = Replace(Cells(Row, 7), .Fields("CylinderHeadType").Value & " ", "")
-                    Cells(Row, 7).Value = Replace(Cells(Row, 7), .Fields("CylinderHeadType").Value, "")
+                If range("G" & row).value Like "*" & .fields("CylinderHeadType").value & "*" Then
+                    Cells(row, 21).value = .fields("CylinderHeadType").value
+                    Cells(row, 7).value = Replace(Cells(row, 7), .fields("CylinderHeadType").value & " ", "")
+                    Cells(row, 7).value = Replace(Cells(row, 7), .fields("CylinderHeadType").value, "")
                     GoTo Exit_Loop
                 End If
                 rst.MoveNext
@@ -649,7 +650,7 @@ Exit_Loop:
 
 End Sub
 
-Private Sub CutAspiration(Row As Integer)
+Private Sub CutAspiration(row As Integer)
 
     Dim aspiration As String
     
@@ -657,22 +658,22 @@ Private Sub CutAspiration(Row As Integer)
     Set rst = MstrDb.Execute("SELECT [Aspiration] FROM Aspirations ORDER BY [ID]")
     
     'go through each row in column G (notes)
-    With Range("G" & Row)
+    With range("G" & row)
         With rst
             'start at beginning of Aspiration field
             rst.MoveFirst
             'loop through the Aspiration Types in the master database
             While (Not .EOF)
                 'if any of the values in the Aspiration field is found in the notes, cut it out and put it in column K
-                If Range("G" & Row).Value Like "*" & .Fields("Aspiration").Value & "*" Then
-                    If .Fields("Aspiration").Value = "Turbo" Then
+                If range("G" & row).value Like "*" & .fields("Aspiration").value & "*" Then
+                    If .fields("Aspiration").value = "Turbo" Then
                         aspiration = "Turbocharged"
                     Else
-                        aspiration = .Fields("Aspiration").Value
+                        aspiration = .fields("Aspiration").value
                     End If
-                    Cells(Row, 11).Value = aspiration
-                    Cells(Row, 7).Value = Replace(Cells(Row, 7), .Fields("Aspiration").Value & " ", "")
-                    Cells(Row, 7).Value = Replace(Cells(Row, 7), .Fields("Aspiration").Value, "")
+                    Cells(row, 11).value = aspiration
+                    Cells(row, 7).value = Replace(Cells(row, 7), .fields("Aspiration").value & " ", "")
+                    Cells(row, 7).value = Replace(Cells(row, 7), .fields("Aspiration").value, "")
                     GoTo Exit_Loop
                 End If
                 rst.MoveNext
@@ -687,28 +688,28 @@ Exit_Loop:
 
 End Sub
 
-Private Sub CutValvesPerEngine(Row As Integer)
+Private Sub CutValvesPerEngine(row As Integer)
     Dim valve As String
     
-    If Cells(Row, 7).Value Like "# Valve *" Then
-        valve = Left(Cells(Row, 7), 1)
-        Cells(Row, 7).Value = Right(Cells(Row, 7).Value, Len(Cells(Row, 7)) - 2)
-        Cells(Row, 49).Value = valve
+    If Cells(row, 7).value Like "# Valve *" Then
+        valve = left(Cells(row, 7), 1)
+        Cells(row, 7).value = Right(Cells(row, 7).value, Len(Cells(row, 7)) - 2)
+        Cells(row, 49).value = valve
     Else
-        If Cells(Row, 7).Value Like "## Valve *" Then
-            valve = Left(Cells(Row, 7), 2)
-            Cells(Row, 7).Value = Right(Cells(Row, 7).Value, Len(Cells(Row, 7)) - 3)
-            Cells(Row, 49).Value = valve
+        If Cells(row, 7).value Like "## Valve *" Then
+            valve = left(Cells(row, 7), 2)
+            Cells(row, 7).value = Right(Cells(row, 7).value, Len(Cells(row, 7)) - 3)
+            Cells(row, 49).value = valve
         Else
-            If Cells(Row, 7).Value Like "# Valve" Then
-                valve = Left(Cells(Row, 7), 1)
-                Cells(Row, 7).Value = ""
-                Cells(Row, 49).Value = valve
+            If Cells(row, 7).value Like "# Valve" Then
+                valve = left(Cells(row, 7), 1)
+                Cells(row, 7).value = ""
+                Cells(row, 49).value = valve
             Else
-                If Cells(Row, 7).Value Like "## Valve" Then
-                    valve = Left(Cells(Row, 7), 2)
-                    Cells(Row, 7).Value = ""
-                    Cells(Row, 49).Value = valve
+                If Cells(row, 7).value Like "## Valve" Then
+                    valve = left(Cells(row, 7), 2)
+                    Cells(row, 7).value = ""
+                    Cells(row, 49).value = valve
                 End If
             End If
         End If
@@ -716,23 +717,23 @@ Private Sub CutValvesPerEngine(Row As Integer)
 
 End Sub
 
-Private Sub CutFuelType(Row As Integer)
+Private Sub CutFuelType(row As Integer)
     
     'run query to return part types
     Set rst = MstrDb.Execute("SELECT [FuelType] FROM FuelTypes ORDER BY [ID]")
     
     'go through each row in column G (notes)
-    With Range("G" & Row)
+    With range("G" & row)
         With rst
             'start at beginning of FuelType field
             rst.MoveFirst
             'loop through the Fuel Types in the master database
             While (Not .EOF)
                 'if any of the values in the Fuel Type field is found in the notes, cut it out and put it in column AH
-                If Range("G" & Row).Value Like "*" & .Fields("FuelType").Value & "*" Then
-                    Cells(Row, 34).Value = .Fields("FuelType").Value
-                    Cells(Row, 7).Value = Replace(Cells(Row, 7), .Fields("FuelType").Value & " ", "")
-                    Cells(Row, 7).Value = Replace(Cells(Row, 7), .Fields("FuelType").Value, "")
+                If range("G" & row).value Like "*" & .fields("FuelType").value & "*" Then
+                    Cells(row, 34).value = .fields("FuelType").value
+                    Cells(row, 7).value = Replace(Cells(row, 7), .fields("FuelType").value & " ", "")
+                    Cells(row, 7).value = Replace(Cells(row, 7), .fields("FuelType").value, "")
                     GoTo Exit_Loop
                 End If
                 rst.MoveNext
@@ -747,24 +748,24 @@ Exit_Loop:
 
 End Sub
 
-Private Sub CutFuelDeliveryType(Row As Integer)
+Private Sub CutFuelDeliveryType(row As Integer)
     
     'rst is the Database established with Global vriables in FixFitmentsModule
     'run query to return part types
     Set rst = MstrDb.Execute("SELECT [FuelDeliveryType] FROM FuelDeliveryTypes ORDER BY [ID]")
     
     'go through each row in column G (notes)
-    With Range("G" & Row)
+    With range("G" & row)
         With rst
             'start at beginning of FuelDeliveryType field
             rst.MoveFirst
             'loop through the Fuel Delivery Types int he master database
             While (Not .EOF)
                 'if any of the values in the Fuel Delivery Type field is found in the notes, cut it out and put it in column AE
-                If Range("G" & Row).Value Like "*" & .Fields("FuelDeliveryType").Value & "*" Then
-                    Cells(Row, 31).Value = .Fields("FuelDeliveryType").Value
-                    Cells(Row, 7).Value = Replace(Cells(Row, 7), .Fields("FuelDeliveryType").Value & " ", "")
-                    Cells(Row, 7).Value = Replace(Cells(Row, 7), .Fields("FuelDeliveryType").Value, "")
+                If range("G" & row).value Like "*" & .fields("FuelDeliveryType").value & "*" Then
+                    Cells(row, 31).value = .fields("FuelDeliveryType").value
+                    Cells(row, 7).value = Replace(Cells(row, 7), .fields("FuelDeliveryType").value & " ", "")
+                    Cells(row, 7).value = Replace(Cells(row, 7), .fields("FuelDeliveryType").value, "")
                     GoTo Exit_Loop
                 End If
                 rst.MoveNext
@@ -779,54 +780,54 @@ Exit_Loop:
 
 End Sub
 
-Private Sub CutVIN(Row As Integer)
+Private Sub CutVIN(row As Integer)
 
     Dim VIN As String
     
-    If Cells(Row, 7).Value Like "* VIN:?" Or Cells(Row, 7).Value Like "* Vin:?" Then
-        VIN = Right(Cells(Row, 7), 1)
-        Cells(Row, 7).Value = Left(Cells(Row, 7).Value, Len(Cells(Row, 7)) - 6)
-        Cells(Row, 27).Value = VIN
+    If Cells(row, 7).value Like "* VIN:?" Or Cells(row, 7).value Like "* Vin:?" Then
+        VIN = Right(Cells(row, 7), 1)
+        Cells(row, 7).value = left(Cells(row, 7).value, Len(Cells(row, 7)) - 6)
+        Cells(row, 27).value = VIN
     Else
-        If Cells(Row, 7).Value Like "*VIN:?" Or Cells(Row, 7).Value Like "*Vin:?" Then
-            VIN = Right(Cells(Row, 7), 1)
-            Cells(Row, 7).Value = Left(Cells(Row, 7).Value, Len(Cells(Row, 7)) - 5)
-            Cells(Row, 27).Value = VIN
+        If Cells(row, 7).value Like "*VIN:?" Or Cells(row, 7).value Like "*Vin:?" Then
+            VIN = Right(Cells(row, 7), 1)
+            Cells(row, 7).value = left(Cells(row, 7).value, Len(Cells(row, 7)) - 5)
+            Cells(row, 27).value = VIN
         End If
     End If
 
 End Sub
 
-Private Sub CutTrim(Row As Integer)
+Private Sub CutTrim(row As Integer)
 
     'Cuts out the trim
     Dim trim As String
     
-    If Cells(Row, 7).Value Like "Trim:*" Then
-        trim = Right(Cells(Row, 7), Len(Cells(Row, 7)) - 5)
-        Cells(Row, 7).Value = ""
-        Cells(Row, 43).Value = trim
+    If Cells(row, 7).value Like "Trim:*" Then
+        trim = Right(Cells(row, 7), Len(Cells(row, 7)) - 5)
+        Cells(row, 7).value = ""
+        Cells(row, 43).value = trim
     End If
 
 End Sub
 
-Private Sub CutMfrLabel(Row As Integer)
+Private Sub CutMfrLabel(row As Integer)
 
     Dim MFR As String
     
-    If Cells(Row, 7).Value Like "*Eng MFG:*" Then
-        MFR = Mid(Cells(Row, 7), InStr(1, Cells(Row, 7), "Eng MFG:") + 8, Len(Cells(Row, 7)) - 8)
-        Cells(Row, 7).Value = Replace(Cells(Row, 7), "Eng MFG:" & MFR, "")
-        Cells(Row, 25).Value = MFR
+    If Cells(row, 7).value Like "*Eng MFG:*" Then
+        MFR = Mid(Cells(row, 7), InStr(1, Cells(row, 7), "Eng MFG:") + 8, Len(Cells(row, 7)) - 8)
+        Cells(row, 7).value = Replace(Cells(row, 7), "Eng MFG:" & MFR, "")
+        Cells(row, 25).value = MFR
     End If
 
 End Sub
 
-Private Sub FillPartNum(Row As Integer)
+Private Sub FillPartNum(row As Integer)
     
-    Cells(Row, 1).Value = PartName    'global variable user entered in SourceForm
-    Cells(Row, 2).Value = "FVKX"      'FVKX is the Store code for our Amazon store in MyFitment
-    Cells(Row, 6).Value = PartTypeVar 'global variable user entered in SourceForm
+    Cells(row, 1).value = PartName    'global variable user entered in SourceForm
+    Cells(row, 2).value = "FVKX"      'FVKX is the Store code for our Amazon store in MyFitment
+    Cells(row, 6).value = PartTypeVar 'global variable user entered in SourceForm
 
 End Sub
 
@@ -836,9 +837,8 @@ Private Sub Headers()
     Rows("1:1").Insert xlDown
     
     'Add ACES headers
-    Range("A1:V1").Value = [{"part", "brand_code", "make", "model", "year", "partterminologyname", "notes", "qty", "mfrlabel", "position", "aspiration","bedlength","bedtype","block","bodynumdoors","bodytype","brakeabs","brakesystem","cc","cid","cylinderheadtype","cylinders"}]
-    Range("W1:AK1").Value = [{"drivetype", "enginedesignation","enginemfr","engineversion","enginevin","frontbraketype","frontspringtype","fueldeliverysubtype","fueldeliverytype","fuelsystemcontroltype","fuelsystemdesign","fueltype","ignitionsystemtype", "liters","mfrbodycode"}]
-    Range("AL1:AX1").Value = [{"rearbraketype", "rearspringtype","region","steeringsystem","steeringtype","submodel","transmissioncontroltype","transmissionmfr","transmissionmfrcode","transmissionnumspeeds", "transmissiontype", "valvesperengine", "wheelbase"}]
+    range("A1:V1").value = [{"part", "brand_code", "make", "model", "year", "partterminologyname", "notes", "qty", "mfrlabel", "position", "aspiration","bedlength","bedtype","block","bodynumdoors","bodytype","brakeabs","brakesystem","cc","cid","cylinderheadtype","cylinders"}]
+    range("W1:AK1").value = [{"drivetype", "enginedesignation","enginemfr","engineversion","enginevin","frontbraketype","frontspringtype","fueldeliverysubtype","fueldeliverytype","fuelsystemcontroltype","fuelsystemdesign","fueltype","ignitionsystemtype", "liters","mfrbodycode"}]
+    range("AL1:AX1").value = [{"rearbraketype", "rearspringtype","region","steeringsystem","steeringtype","submodel","transmissioncontroltype","transmissionmfr","transmissionmfrcode","transmissionnumspeeds", "transmissiontype", "valvesperengine", "wheelbase"}]
 
 End Sub
-

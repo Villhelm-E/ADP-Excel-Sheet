@@ -80,27 +80,45 @@ Public Sub CallbackFormatBoM(control As IRibbonControl)
 
 End Sub
 
+Public Sub CallbackReplaceComponent(control As IRibbonControl)
+
+    ReplaceComp     'BillofMaterials Module
+
+End Sub
+
 Public Sub CallbackFinaleProducts(contorl As IRibbonControl)
 
-    FinaleProductsMain
+    FinaleProductsMain  'Finale Module
 
 End Sub
 
 Public Sub CallbackFinaleStockTake(control As IRibbonControl)
 
-    FinaleStockTakeMain
+    FinaleStockTakeMain 'Finale Module
 
 End Sub
 
 Public Sub CallbackFinaleBillofMaterials(control As IRibbonControl)
 
-    FinaleBoMMain
+    FinaleBoMMain   'Finale Module
 
 End Sub
 
 Public Sub CallbackFinaleLookups(control As IRibbonControl)
 
-    FinaleLookupsMain
+    FinaleLookupsMain   'Finale Module
+
+End Sub
+
+Public Sub CallbackShipping(control As IRibbonControl)
+
+    ShippingMain    'Finale Module
+
+End Sub
+
+Public Sub CallbackPOItems(control As IRibbonControl)
+
+    POMain  'Finale Module
 
 End Sub
 
@@ -124,13 +142,19 @@ End Sub
 
 Public Sub CallbackUPC(control As IRibbonControl)
 
-    UPC 'Barcodes module
+    UPC 'GS1 module
 
 End Sub
 
 Public Sub CallbackEbayVolumePricing(control As IRibbonControl)
 
     VolumePricing
+
+End Sub
+
+Public Sub CallbackWalmart(control As IRibbonControl)
+
+    WalmartMain    'Walmart Module
 
 End Sub
 
@@ -167,12 +191,6 @@ End Sub
 Public Sub CallbackVariables(control As IRibbonControl)
 
     VariablesForm.Show
-
-End Sub
-
-Public Sub CallbackVersion(control As IRibbonControl)
-
-    OfficeVersion   'About module
 
 End Sub
 

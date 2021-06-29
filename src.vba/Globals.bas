@@ -1,5 +1,8 @@
 Option Explicit
 
+'ADP Excel Sheet Version
+Public Const ThisVersion As String = "4.4"
+
 'Variables to connect to databases
 Public MstrDb As New ADODB.Connection
 Public FndStsDb As New ADODB.Connection
@@ -43,4 +46,5 @@ Public CategoriesArr() As Variant
 Public InventoryType As String
 
 'For debugging
-Public BypassRibbon As Boolean
+Public DebugMode As Boolean
+

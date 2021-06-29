@@ -2,7 +2,10 @@ Option Explicit
 
 Private Function Provider() As String
 
-    Provider = "Provider=Microsoft.ACE.OLEDB.15.0;"         '12.0 is Office 2007 version
+    Dim appVersion
+    appVersion = Application.Version
+    
+    Provider = "Provider=Microsoft.ACE.OLEDB." & appVersion & ";"
 
 End Function
 
@@ -22,7 +25,7 @@ Public Sub ConnectMasterDatabase()
     Exit Sub
     
 Connection_Error:
-    MsgBox "There was a problem connecting to the Master Database"
+    MsgBox ("There was a problem connecting to the Master Database")
 
 End Sub
 
@@ -42,7 +45,7 @@ Public Sub ConnectFindSetsDatabase()
     Exit Sub
     
 Connection_Error:
-    MsgBox "There was a problem connecting to the Find Sets Database"
+    MsgBox ("There was a problem connecting to the Find Sets Database")
 
 End Sub
 
@@ -64,8 +67,8 @@ Public Sub ConnectSixbitDatabase()
     Set rst = MstrDb.Execute("SELECT * FROM Sixbit_DB_Fields")
     rst.MoveLast
     
-    User = rst.Fields("Sixbit_UserID").Value
-    pw = rst.Fields("Sixbit_PW").Value
+    User = rst.fields("Sixbit_UserID").value
+    pw = rst.fields("Sixbit_PW").value
     
     SxbtDb.Open "Provider=SQLOLEDB;Server=ADP-SERVER\SIXBITDBSERVER;Database=Sixbit;User Id=" & User & ";Password=" & pw & ";"
     SxbtDb.CursorLocation = adUseClient
@@ -78,6 +81,43 @@ Public Sub ConnectSixbitDatabase()
     Exit Sub
 
 Connection_Error:
-    MsgBox "There was a problem connecting to the Sixbit Database"
+    MsgBox ("There was a problem connecting to the Sixbit Database")
+
+End Sub
+
+Public Sub ConnectADP_SQL_SERVER()
+
+    Dim Server_Name As String
+    Dim Database_Name As String
+    
+    On Error GoTo Connection_Error
+    
+    'Set Connection Timeouts
+    Dim ADP_SQL As New ADODB.Connection
+    
+    ADP_SQL.ConnectionTimeout = 0
+    ADP_SQL.CommandTimeout = 0
+    
+    'Open connection to ADP_SQ_SERVER\Seller Permits Database
+    'Open username info
+    Dim User As String
+    Dim pw As String
+    Set rst = MstrDb.Execute("SELECT * FROM Databases WHERE Database = ""Seller Permits""")
+    rst.MoveFirst
+    
+    User = rst.fields("User").value
+    pw = rst.fields("Password").value
+    
+    ADP_SQL.Open "Provider=SQLOLEDB;Server=192.168.1.101,1450;Database=ADP Seller Permits Database;User Id=AccessUser;Password=H$xZiRvX35^u6ouqoBH64fPUb*BY8%CS"
+    ADP_SQL.CursorLocation = adUseClient
+    
+    rst.Close
+    User = ""
+    pw = ""
+    
+    Exit Sub
+    
+Connection_Error:
+    MsgBox ("There was a problem connecting to ADP_SQL_SERVER\Seller Permits Database")
 
 End Sub

@@ -21,29 +21,29 @@ End Sub
 
 Private Sub AddHeaders()
 
-    Range("A1").Value = "SKU"
-    Range("B1").Value = "Your Part #"
-    Range("C1").Value = "Inherits Fitment From Part #"
-    Range("D1").Value = "ASIN"
-    Range("E1").Value = "UPC"
-    Range("F1").Value = "Description"
-    Range("G1").Value = "Label"
-    Range("H1").Value = "Landing Page URL"
-    Range("I1").Value = "AAIA Part Type"
-    Range("J1").Value = "AAIA Brand Code"
+    range("A1").value = "SKU"
+    range("B1").value = "Your Part #"
+    range("C1").value = "Inherits Fitment From Part #"
+    range("D1").value = "ASIN"
+    range("E1").value = "UPC"
+    range("F1").value = "Description"
+    range("G1").value = "Label"
+    range("H1").value = "Landing Page URL"
+    range("I1").value = "AAIA Part Type"
+    range("J1").value = "AAIA Brand Code"
 
 End Sub
 
 Private Sub FormatHeaders()
 
     'color
-    Range("A1:B1").Interior.Color = RGB(0, 176, 240)    'part number fields
-    Range("C1:H1").Interior.Color = RGB(204, 255, 204)  'MyFitment fields
-    Range("I1:J1").Interior.Color = RGB(255, 255, 0)    'AAIA fields
+    range("A1:B1").Interior.Color = RGB(0, 176, 240)    'part number fields
+    range("C1:H1").Interior.Color = RGB(204, 255, 204)  'MyFitment fields
+    range("I1:J1").Interior.Color = RGB(255, 255, 0)    'AAIA fields
     
     'Borders
-    Range("A1:J1").Borders(xlEdgeBottom).LineStyle = xlContinuous
-    With Range("A1:J1")
+    range("A1:J1").Borders(xlEdgeBottom).LineStyle = xlContinuous
+    With range("A1:J1")
         .Borders(xlEdgeLeft).LineStyle = xlContinuous
         .Borders(xlEdgeTop).LineStyle = xlContinuous
         .Borders(xlEdgeBottom).LineStyle = xlContinuous
