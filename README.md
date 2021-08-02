@@ -50,6 +50,7 @@ This button generates a template for activating or updating GTINs in GS1 Data Hu
 ### ![Volume Pricing icon](https://github.com/Villhelm-E/ADP-Excel-Sheet/blob/master/Icons/Volume%20Pricing.png) Ebay Volume Pricing
 This button generates a template for creating volume pricing in Ebay (a feature that Ebay seems to have removed). May be deprecated in the future.
 ### ![walmart icon](https://github.com/Villhelm-E/ADP-Excel-Sheet/blob/master/Icons/walmart.png) List Walmart
+This button generates a template for listing on Walmart
 ## Export
 ### ![xlsx icon](https://github.com/Villhelm-E/ADP-Excel-Sheet/blob/master/Icons/xlsx.png) ![csv365](https://github.com/Villhelm-E/ADP-Excel-Sheet/blob/master/Icons/csv365.png) ![txt icon](https://github.com/Villhelm-E/ADP-Excel-Sheet/blob/master/Icons/txt.png) File Formats
 Clicking on the export buttons will save the current worksheet as XLSX, CSV or TXT format.
